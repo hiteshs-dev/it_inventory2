@@ -65,29 +65,26 @@ assetForm.addEventListener("submit", async e => {
   };
 
   try {
-    const res = await fetch(`${API_BASE}/assets`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+  const res = await fetch(`${API_BASE}/assets`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-    const result = await res.json();
-
-    if (!res.ok) {
-      console.error(result);
-      alert("❌ Submit failed. Check console.");
-      return;
-    }
-
-    alert("✅ Asset Added Successfully");
-    assetForm.reset();
-    toggleFields();
-    loadDashboard();
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ Network error. Check console.");
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText);
   }
+
+  alert("✅ Asset added successfully");
+  assetForm.reset();
+  toggleFields();
+
+} catch (err) {
+  console.error("SUBMIT ERROR:", err);
+  alert("❌ Submit failed. Check console.");
+}
+
 });
 
 /* ---------------- DASHBOARD ---------------- */
