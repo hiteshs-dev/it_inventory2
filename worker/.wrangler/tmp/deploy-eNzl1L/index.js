@@ -1,33 +1,26 @@
-export default {
+// src/index.js
+var index_default = {
   async fetch(request, env) {
     const url = new URL(request.url);
-
-    // CORS
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type"
     };
-
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
-
-    /* ---------------- HEALTH CHECK ---------------- */
     if (url.pathname === "/" && request.method === "GET") {
       return new Response(
         JSON.stringify({
           status: "ITM Inventory API is running",
-          time: new Date().toISOString(),
+          time: (/* @__PURE__ */ new Date()).toISOString()
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    /* ---------------- ADD ASSET ---------------- */
     if (url.pathname === "/assets" && request.method === "POST") {
       const data = await request.json();
-
       await env.DB.prepare(`
         INSERT INTO assets (
           role, title, name, email, batch, roll_no,
@@ -62,29 +55,27 @@ export default {
         data.storage,
         data.remarks
       ).run();
-
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    /* ---------------- GET ALL ASSETS ---------------- */
     if (url.pathname === "/assets" && request.method === "GET") {
       const { results } = await env.DB.prepare(
         "SELECT * FROM assets ORDER BY created_at DESC"
       ).all();
-
       return new Response(
         JSON.stringify(results),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    /* ---------------- 404 ---------------- */
     return new Response(
       JSON.stringify({ error: "Route not found" }),
       { status: 404, headers: corsHeaders }
     );
-  },
+  }
 };
+export {
+  index_default as default
+};
+//# sourceMappingURL=index.js.map
