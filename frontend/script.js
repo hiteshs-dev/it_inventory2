@@ -1,3 +1,5 @@
+alert("script.js loaded");
+
 const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
 /* ---------------- LOGIN ---------------- */
