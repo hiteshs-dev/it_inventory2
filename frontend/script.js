@@ -40,21 +40,21 @@ function toggleFields() {
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
 
-  const payload = {
+  const data = {
     role: role.value,
-    title: title.value,
     name: name.value,
     email: email.value,
-    batch: batch?.value || "",
-    roll_no: rollNo?.value || "",
-    department: dept?.value || "",
-    designation: designation?.value || "",
-    emp_id: empId?.value || "",
-    location: location.value,
+    batch: role.value === "student" ? batch.value : "",
+    roll_no: role.value === "student" ? rollNo.value : "",
+    department: role.value === "employee" ? dept.value : "",
+    designation: role.value === "employee" ? designation.value : "",
+    emp_id: role.value === "employee" ? empId.value : "",
+    location:
+      role.value === "student"
+        ? studentLocation.value
+        : empLocation.value,
     asset_desc: assetDesc.value,
-    asset_type: asset_type.value,
     serial_no: assetId.value,
-    purchase_date: purchase_date.value,
     brand: brand.value,
     model: model.value,
     ram: ram.value,
@@ -63,15 +63,26 @@ assetForm.addEventListener("submit", async e => {
     remarks: remarks.value
   };
 
-  await fetch(`${API_BASE}/api/add`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  try {
+    const res = await fetch(
+      "https://itm-inventory-api.hiteshs.workers.dev/api/add",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      }
+    );
 
-  alert("✅ Asset saved successfully");
-  assetForm.reset();
-  loadDashboard();
+    if (!res.ok) throw new Error("API error");
+
+    alert("✅ Asset Added Successfully");
+    assetForm.reset();
+    toggleFields();
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Submit failed. Check console.");
+  }
 });
 
 /* ---------------- DASHBOARD ---------------- */
