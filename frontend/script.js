@@ -1,94 +1,140 @@
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
+const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
-    // Enable CORS
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    };
+/* ---------------- LOGIN ---------------- */
+document.getElementById("loginForm").addEventListener("submit", e => {
+  e.preventDefault();
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
-    }
+  const user = username.value;
+  const pass = password.value;
 
-    try {
-      // ✅ TEST ROUTE
-      if (url.pathname === "/") {
-        return new Response(
-          JSON.stringify({ status: "ITM Inventory API is running" }),
-          { headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
-      }
-
-      // ✅ GET ALL ASSETS
-      if (url.pathname === "/api/all" && request.method === "GET") {
-        const { results } = await env.DB
-          .prepare("SELECT * FROM assets ORDER BY created_at DESC")
-          .all();
-
-        return new Response(JSON.stringify(results), {
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-
-      // ✅ ADD NEW ASSET
-      if (url.pathname === "/api/add" && request.method === "POST") {
-        const data = await request.json();
-
-        await env.DB.prepare(`
-          INSERT INTO assets (
-            role, title, name, email, batch, roll_no,
-            department, designation, emp_id, location,
-            asset_desc, asset_type, serial_no, purchase_date,
-            brand, model, ram, processor, storage, remarks
-          ) VALUES (
-            ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?,
-            ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?
-          )
-        `).bind(
-          data.role,
-          data.title,
-          data.name,
-          data.email,
-          data.batch,
-          data.roll_no,
-          data.department,
-          data.designation,
-          data.emp_id,
-          data.location,
-          data.asset_desc,
-          data.asset_type,
-          data.serial_no,
-          data.purchase_date,
-          data.brand,
-          data.model,
-          data.ram,
-          data.processor,
-          data.storage,
-          data.remarks
-        ).run();
-
-        return new Response(
-          JSON.stringify({ success: true }),
-          { headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
-      }
-
-      // ❌ UNKNOWN ROUTE
-      return new Response(
-        JSON.stringify({ error: "Route not found" }),
-        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-
-    } catch (err) {
-      return new Response(
-        JSON.stringify({ error: err.message }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
+  if (user === "admin" && pass === "unix@2026") {
+    loginModal.style.display = "none";
+    navTabs.style.display = "flex";
+    loadDashboard();
+  } else {
+    loginError.style.display = "block";
   }
-};
+});
+
+function logout() {
+  location.reload();
+}
+
+/* ---------------- PAGE SWITCH ---------------- */
+function switchPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+  document.getElementById(`page-${page}`).classList.add("active");
+  event.target.classList.add("active");
+}
+
+/* ---------------- ROLE TOGGLE ---------------- */
+function toggleFields() {
+  const role = document.getElementById("role").value;
+  studentFields.style.display = role === "student" ? "block" : "none";
+  empFields.style.display = role === "employee" ? "block" : "none";
+}
+
+/* ---------------- SUBMIT FORM ---------------- */
+assetForm.addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const payload = {
+    role: role.value,
+    title: title.value,
+    name: name.value,
+    email: email.value,
+    batch: batch?.value || "",
+    roll_no: rollNo?.value || "",
+    department: dept?.value || "",
+    designation: designation?.value || "",
+    emp_id: empId?.value || "",
+    location: location.value,
+    asset_desc: assetDesc.value,
+    asset_type: asset_type.value,
+    serial_no: assetId.value,
+    purchase_date: purchase_date.value,
+    brand: brand.value,
+    model: model.value,
+    ram: ram.value,
+    processor: processor.value,
+    storage: hdd.value,
+    remarks: remarks.value
+  };
+
+  await fetch(`${API_BASE}/api/add`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  alert("✅ Asset saved successfully");
+  assetForm.reset();
+  loadDashboard();
+});
+
+/* ---------------- DASHBOARD ---------------- */
+async function loadDashboard() {
+  const res = await fetch(`${API_BASE}/api/all`);
+  const data = await res.json();
+
+  statTotal.innerText = data.length;
+  statStudents.innerText = data.filter(d => d.role === "student").length;
+  statEmployees.innerText = data.filter(d => d.role === "employee").length;
+
+  dashTable.innerHTML = "";
+  recentList.innerHTML = "";
+
+  data.slice(0, 5).forEach(d => {
+    recentList.innerHTML += `<div>• ${d.name} (${d.asset_type})</div>`;
+  });
+
+  data.forEach(d => {
+    dashTable.innerHTML += `
+      <tr>
+        <td>${d.name}</td>
+        <td>${d.role}</td>
+        <td>${d.asset_type}</td>
+        <td>${d.serial_no}</td>
+        <td>-</td>
+      </tr>
+    `;
+  });
+
+  drawCharts(data);
+}
+
+/* ---------------- CHARTS ---------------- */
+let roleChart, batchChart;
+
+function drawCharts(data) {
+  const students = data.filter(d => d.role === "student").length;
+  const employees = data.filter(d => d.role === "employee").length;
+
+  roleChart?.destroy();
+  roleChart = new Chart(roleChartCtx, {
+    type: "doughnut",
+    data: {
+      labels: ["Students", "Employees"],
+      datasets: [{ data: [students, employees] }]
+    }
+  });
+
+  const batches = {};
+  data.forEach(d => {
+    if (d.batch) batches[d.batch] = (batches[d.batch] || 0) + 1;
+  });
+
+  batchChart?.destroy();
+  batchChart = new Chart(batchChartCtx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(batches),
+      datasets: [{ data: Object.values(batches) }]
+    }
+  });
+}
+
+const roleChartCtx = document.getElementById("roleChart");
+const batchChartCtx = document.getElementById("batchChart");
