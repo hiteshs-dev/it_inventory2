@@ -1,95 +1,94 @@
-const API = "https://api.itmitinventory.dpdns.org"; // Cloudflare Worker URL
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
 
-// ---------------- LOGIN ----------------
-document.getElementById("loginForm").addEventListener("submit", e => {
-  e.preventDefault();
-  loginModal.style.display = "none";
-  navTabs.style.display = "flex";
-});
+    // Enable CORS
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
 
-// ---------------- PAGE SWITCH ----------------
-function switchPage(page) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById("page-" + page).classList.add("active");
-  if (page === "dashboard") loadDashboard();
-}
-
-function logout() {
-  location.reload();
-}
-
-// ---------------- ROLE TOGGLE ----------------
-function toggleFields() {
-  const role = document.getElementById("role").value;
-  studentFields.style.display = role === "student" ? "block" : "none";
-  empFields.style.display = role === "employee" ? "block" : "none";
-}
-
-// ---------------- SUBMIT FORM ----------------
-assetForm.addEventListener("submit", async e => {
-  e.preventDefault();
-
-  const role = document.getElementById("role").value;
-
-  const payload = {
-    role,
-    title: title.value,
-    name: name.value,
-    email: email.value,
-    batch: batch.value,
-    rollNo: rollNo.value,
-    dept: dept.value,
-    designation: designation.value,
-    empId: empId.value,
-    location: role === "student" ? studentLocation.value : empLocation.value,
-
-    assetDesc: assetDesc.value,
-    assetType: assetType.value,
-    assetId: assetId.value,
-    purchaseDate: purchaseDate.value,
-    brand: brand.value,
-    model: model.value,
-    ram: ram.value,
-    processor: processor.value,
-    storage: storage.value,
-    remarks: remarks.value
-  };
-
-  await fetch(API + "/add", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  alert("Entry Saved Successfully");
-  assetForm.reset();
-});
-
-// ---------------- DASHBOARD ----------------
-let chart;
-
-async function loadDashboard() {
-  const res = await fetch(API + "/list");
-  const data = await res.json();
-
-  statTotal.textContent = data.length;
-  statStudents.textContent = data.filter(d => d.role === "student").length;
-  statEmployees.textContent = data.filter(d => d.role === "employee").length;
-
-  renderChart(data);
-}
-
-function renderChart(data) {
-  const students = data.filter(d => d.role === "student").length;
-  const employees = data.filter(d => d.role === "employee").length;
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(roleChart, {
-    type: "pie",
-    data: {
-      labels: ["Students", "Employees"],
-      datasets: [{ data: [students, employees] }]
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
     }
-  });
-}
+
+    try {
+      // ✅ TEST ROUTE
+      if (url.pathname === "/") {
+        return new Response(
+          JSON.stringify({ status: "ITM Inventory API is running" }),
+          { headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // ✅ GET ALL ASSETS
+      if (url.pathname === "/api/all" && request.method === "GET") {
+        const { results } = await env.DB
+          .prepare("SELECT * FROM assets ORDER BY created_at DESC")
+          .all();
+
+        return new Response(JSON.stringify(results), {
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+
+      // ✅ ADD NEW ASSET
+      if (url.pathname === "/api/add" && request.method === "POST") {
+        const data = await request.json();
+
+        await env.DB.prepare(`
+          INSERT INTO assets (
+            role, title, name, email, batch, roll_no,
+            department, designation, emp_id, location,
+            asset_desc, asset_type, serial_no, purchase_date,
+            brand, model, ram, processor, storage, remarks
+          ) VALUES (
+            ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?,
+            ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?
+          )
+        `).bind(
+          data.role,
+          data.title,
+          data.name,
+          data.email,
+          data.batch,
+          data.roll_no,
+          data.department,
+          data.designation,
+          data.emp_id,
+          data.location,
+          data.asset_desc,
+          data.asset_type,
+          data.serial_no,
+          data.purchase_date,
+          data.brand,
+          data.model,
+          data.ram,
+          data.processor,
+          data.storage,
+          data.remarks
+        ).run();
+
+        return new Response(
+          JSON.stringify({ success: true }),
+          { headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      // ❌ UNKNOWN ROUTE
+      return new Response(
+        JSON.stringify({ error: "Route not found" }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+
+    } catch (err) {
+      return new Response(
+        JSON.stringify({ error: err.message }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+  }
+};
