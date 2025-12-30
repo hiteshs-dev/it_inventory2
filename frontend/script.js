@@ -1,4 +1,4 @@
-const API = "https://YOUR_WORKER_URL"; // Cloudflare Worker URL
+const API = "https://api.itmitinventory.dpdns.org"; // Cloudflare Worker URL
 
 // ---------------- LOGIN ----------------
 document.getElementById("loginForm").addEventListener("submit", e => {
