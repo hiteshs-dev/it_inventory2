@@ -31,17 +31,18 @@ function switchPage(page) {
 
 /* ---------------- ROLE TOGGLE ---------------- */
 function toggleFields() {
-  const role = document.getElementById("role").value;
-  studentFields.style.display = role === "student" ? "block" : "none";
-  empFields.style.display = role === "employee" ? "block" : "none";
+  const r = role.value;
+  studentFields.style.display = r === "student" ? "block" : "none";
+  empFields.style.display = r === "employee" ? "block" : "none";
 }
 
-/* ---------------- SUBMIT FORM ---------------- */
+/* ---------------- SUBMIT FORM (FIXED) ---------------- */
 assetForm.addEventListener("submit", async e => {
-  e.preventDefault();
+  e.preventDefault(); // 🔴 REQUIRED
 
-  const data = {
+  const payload = {
     role: role.value,
+    title: title.value,
     name: name.value,
     email: email.value,
     batch: role.value === "student" ? batch.value : "",
@@ -49,12 +50,12 @@ assetForm.addEventListener("submit", async e => {
     department: role.value === "employee" ? dept.value : "",
     designation: role.value === "employee" ? designation.value : "",
     emp_id: role.value === "employee" ? empId.value : "",
-    location:
-      role.value === "student"
-        ? studentLocation.value
-        : empLocation.value,
+    location: location.value,
+
     asset_desc: assetDesc.value,
+    asset_type: asset_type.value,
     serial_no: assetId.value,
+    purchase_date: purchase_date.value,
     brand: brand.value,
     model: model.value,
     ram: ram.value,
@@ -64,30 +65,34 @@ assetForm.addEventListener("submit", async e => {
   };
 
   try {
-    const res = await fetch(
-      "https://itm-inventory-api.hiteshs.workers.dev/api/add",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      }
-    );
+    const res = await fetch(`${API_BASE}/assets`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-    if (!res.ok) throw new Error("API error");
+    const result = await res.json();
+
+    if (!res.ok) {
+      console.error(result);
+      alert("❌ Submit failed. Check console.");
+      return;
+    }
 
     alert("✅ Asset Added Successfully");
     assetForm.reset();
     toggleFields();
+    loadDashboard();
 
   } catch (err) {
     console.error(err);
-    alert("❌ Submit failed. Check console.");
+    alert("❌ Network error. Check console.");
   }
 });
 
 /* ---------------- DASHBOARD ---------------- */
 async function loadDashboard() {
-  const res = await fetch(`${API_BASE}/api/all`);
+  const res = await fetch(`${API_BASE}/assets`);
   const data = await res.json();
 
   statTotal.innerText = data.length;
