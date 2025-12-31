@@ -81,6 +81,44 @@ export default {
       );
     }
 
+    /* ---------------- EXPORT CSV (EXCEL DOWNLOAD) ---------------- */
+    if (url.pathname === "/export" && request.method === "GET") {
+      const role = url.searchParams.get("role");
+      const batch = url.searchParams.get("batch");
+
+      let query = "SELECT * FROM assets WHERE role = ?";
+      let params = [role];
+
+      if (batch && batch !== "all") {
+        query += " AND batch = ?";
+        params.push(batch);
+      }
+
+      const { results } = await env.DB
+        .prepare(query)
+        .bind(...params)
+        .all();
+
+      // Convert to CSV
+      let csv = "";
+      if (results.length > 0) {
+        csv += Object.keys(results[0]).join(",") + "\n";
+        results.forEach(row => {
+          csv += Object.values(row)
+            .map(v => `"${String(v ?? "").replace(/"/g, '""')}"`)
+            .join(",") + "\n";
+        });
+      }
+
+      return new Response(csv, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/csv",
+          "Content-Disposition": `attachment; filename="${role}_${batch || "all"}.csv"`,
+        },
+      });
+    }
+
     /* ---------------- 404 ---------------- */
     return new Response(
       JSON.stringify({ error: "Route not found" }),

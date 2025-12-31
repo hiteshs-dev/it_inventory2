@@ -172,6 +172,17 @@ async function loadDashboard() {
     `;
   });
 }
+/* ---------------- DOWNLOAD CSV / EXCEL ---------------- */
+function downloadSpecific(role, batch) {
+  let url = `${API_BASE}/export?role=${role}`;
+
+  if (batch !== "all") {
+    url += `&batch=${batch}`;
+  }
+
+  // Force browser download
+  window.location.href = url;
+}
 
 /* ================== INIT ================== */
 toggleFields();
