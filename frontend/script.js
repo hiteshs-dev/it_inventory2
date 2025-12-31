@@ -105,7 +105,7 @@ platform.addEventListener("change", toggleMacField);
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
 
-  const isEdit = !!editId;
+  const isEdit = editId !== null;   // 🔥 THIS IS THE KEY FIX
 
   const payload = {
     role: role.value,
@@ -133,7 +133,7 @@ assetForm.addEventListener("submit", async e => {
   };
 
   const url = isEdit
-    ? `${API_BASE}/assets/${editId}`
+    ? `${API_BASE}/assets/${editId}`   // ✅ PUT target
     : `${API_BASE}/assets`;
 
   const method = isEdit ? "PUT" : "POST";
@@ -145,17 +145,24 @@ assetForm.addEventListener("submit", async e => {
   });
 
   const result = await res.json();
-  if (!result.success) return alert("Operation failed");
 
-  alert(isEdit ? "✅ Asset Updated" : "✅ Asset Added");
+  if (!result.success) {
+    alert("❌ Operation failed");
+    return;
+  }
 
+  alert(isEdit ? "✅ Asset Updated Successfully" : "✅ Asset Added");
+
+  // 🔥 RESET ONLY AFTER SUCCESS
   editId = null;
   assetForm.reset();
   toggleFields();
   toggleMacField();
+
   document.getElementById("submitBtn").innerText = "Submit Entry";
-  loadDashboard();
+  switchPage("dashboard");
 });
+
 
 /* ================== DASHBOARD ================== */
 async function loadDashboard() {
