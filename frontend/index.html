@@ -226,6 +226,23 @@
         </div>
 
         <!-- Page 2: Dashboard -->
+         <div style="display:flex; gap:10px; margin-bottom:15px;">
+  <input id="searchInput" placeholder="Search name / serial / asset">
+  
+  <select id="filterRole">
+    <option value="">All Roles</option>
+    <option value="student">Student</option>
+    <option value="employee">Employee</option>
+  </select>
+
+  <select id="filterBatch">
+    <option value="">All Batches</option>
+    <option value="2026">2026</option>
+    <option value="2027">2027</option>
+  </select>
+
+  <button class="btn-submit" onclick="applyFilters()">Apply</button>
+</div>
         <div id="page-dashboard" class="page">
             <h2 class="page-title">Analytics Dashboard</h2>
             

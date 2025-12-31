@@ -52,6 +52,16 @@ const statEmployees = document.getElementById("statEmployees");
 const dashTable = document.getElementById("dashTable");
 const recentList = document.getElementById("recentList");
 
+const searchInput = document.getElementById("searchInput");
+const filterRole = document.getElementById("filterRole");
+const filterBatch = document.getElementById("filterBatch");
+
+const roleChartCtx = document.getElementById("roleChart");
+const batchChartCtx = document.getElementById("batchChart");
+
+let roleChart = null;
+let batchChart = null;
+
 /* ================== LOGIN ================== */
 document.getElementById("loginForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -89,7 +99,7 @@ function toggleFields() {
   }
 }
 
-/* ================== SUBMIT FORM (FIXED) ================== */
+/* ================== SUBMIT FORM ================== */
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -107,7 +117,6 @@ assetForm.addEventListener("submit", async e => {
       role.value === "student"
         ? studentLocation.value
         : empLocation.value,
-
     asset_desc: assetDesc.value,
     asset_type: asset_type.value,
     serial_no: assetId.value,
@@ -144,11 +153,15 @@ assetForm.addEventListener("submit", async e => {
   }
 });
 
-/* ================== DASHBOARD ================== */
+/* ================== LOAD DASHBOARD ================== */
 async function loadDashboard() {
   const res = await fetch(`${API_BASE}/assets`);
   const data = await res.json();
+  renderDashboard(data);
+}
 
+/* ================== RENDER DASHBOARD ================== */
+function renderDashboard(data) {
   statTotal.innerText = data.length;
   statStudents.innerText = data.filter(d => d.role === "student").length;
   statEmployees.innerText = data.filter(d => d.role === "employee").length;
@@ -167,21 +180,89 @@ async function loadDashboard() {
         <td>${d.role}</td>
         <td>${d.asset_type}</td>
         <td>${d.serial_no}</td>
-        <td>-</td>
+        <td>
+          <button onclick="editAsset(${d.id})">✏️</button>
+          <button onclick="deleteAsset(${d.id})">🗑</button>
+        </td>
       </tr>
     `;
   });
-}
-/* ---------------- DOWNLOAD CSV / EXCEL ---------------- */
-function downloadSpecific(role, batch) {
-  let url = `${API_BASE}/export?role=${role}`;
 
-  if (batch !== "all") {
-    url += `&batch=${batch}`;
+  drawCharts(data);
+}
+
+/* ================== CHARTS ================== */
+function drawCharts(data) {
+  const roleCount = {};
+  const batchCount = {};
+
+  data.forEach(d => {
+    roleCount[d.role] = (roleCount[d.role] || 0) + 1;
+    if (d.batch) batchCount[d.batch] = (batchCount[d.batch] || 0) + 1;
+  });
+
+  if (roleChart) roleChart.destroy();
+  if (batchChart) batchChart.destroy();
+
+  roleChart = new Chart(roleChartCtx, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(roleCount),
+      datasets: [{
+        data: Object.values(roleCount),
+        backgroundColor: ["#2563eb", "#9333ea"]
+      }]
+    }
+  });
+
+  batchChart = new Chart(batchChartCtx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(batchCount),
+      datasets: [{
+        label: "Assets",
+        data: Object.values(batchCount),
+        backgroundColor: "#2563eb"
+      }]
+    }
+  });
+}
+
+/* ================== SEARCH / FILTER ================== */
+async function applyFilters() {
+  const q = searchInput.value.toLowerCase();
+  const roleVal = filterRole.value;
+  const batchVal = filterBatch.value;
+
+  const res = await fetch(`${API_BASE}/assets`);
+  let data = await res.json();
+
+  if (q) {
+    data = data.filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      d.serial_no.toLowerCase().includes(q)
+    );
   }
 
-  // Force browser download
-  window.location.href = url;
+  if (roleVal !== "all") {
+    data = data.filter(d => d.role === roleVal);
+  }
+
+  if (batchVal !== "all") {
+    data = data.filter(d => d.batch === batchVal);
+  }
+
+  renderDashboard(data);
+}
+
+/* ================== DELETE (API REQUIRED) ================== */
+async function deleteAsset(id) {
+  alert("Delete API not added yet");
+}
+
+/* ================== EDIT (UI ONLY) ================== */
+async function editAsset(id) {
+  alert("Edit API not added yet");
 }
 
 /* ================== INIT ================== */

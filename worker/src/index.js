@@ -25,10 +25,32 @@ export default {
     }
 
     /* ---------------- ADD ASSET ---------------- */
-    if (url.pathname === "/assets" && request.method === "POST") {
-      const data = await request.json();
+    if (url.pathname === "/assets" && request.method === "GET") {
+  const search = url.searchParams.get("search") || "";
+  const role = url.searchParams.get("role");
+  const batch = url.searchParams.get("batch");
 
-      await env.DB.prepare(`
+  let query = "SELECT * FROM assets WHERE 1=1";
+  const params = [];
+
+  if (search) {
+    query += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
+  if (role) {
+    query += " AND role = ?";
+    params.push(role);
+  }
+
+  if (batch) {
+    query += " AND batch = ?";
+    params.push(batch);
+  }
+
+  query += " ORDER BY created_at DESC";
+
+      const { results } = await env.DB.prepare(`
         INSERT INTO assets (
           role, title, name, email, batch, roll_no,
           department, designation, emp_id, location,
@@ -70,15 +92,16 @@ export default {
     }
 
     /* ---------------- GET ALL ASSETS ---------------- */
-    if (url.pathname === "/assets" && request.method === "GET") {
-      const { results } = await env.DB.prepare(
-        "SELECT * FROM assets ORDER BY created_at DESC"
-      ).all();
+    if (url.pathname.startsWith("/assets/") && request.method === "DELETE") {
+    const id = url.pathname.split("/")[2];
 
-      return new Response(
-        JSON.stringify(results),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    await env.DB.prepare("DELETE FROM assets WHERE id = ?")
+    .bind(id)
+    .run();
+
+    return new Response(JSON.stringify({ success: true }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     /* ---------------- EXPORT CSV (EXCEL DOWNLOAD) ---------------- */
