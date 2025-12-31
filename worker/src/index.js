@@ -89,60 +89,56 @@ export default {
     }
 
     /* ================== GET ASSETS (PAGINATED) ================== */
-    if (url.pathname === "/assets" && request.method === "GET") {
-      const search = url.searchParams.get("search") || "";
-      const role = url.searchParams.get("role");
-      const batch = url.searchParams.get("batch");
+if (url.pathname === "/assets" && request.method === "GET") {
+  const page = parseInt(url.searchParams.get("page") || "1");
+  const limit = parseInt(url.searchParams.get("limit") || "50");
+  const offset = (page - 1) * limit;
 
-      const page = parseInt(url.searchParams.get("page") || "1");
-      const limit = parseInt(url.searchParams.get("limit") || "50");
-      const offset = (page - 1) * limit;
+  const search = url.searchParams.get("search") || "";
+  const role = url.searchParams.get("role");
+  const batch = url.searchParams.get("batch");
 
-      let where = "WHERE 1=1";
-      const params = [];
+  let where = "WHERE 1=1";
+  const params = [];
 
-      if (search) {
-        where += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-      }
+  if (search) {
+    where += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
 
-      if (role) {
-        where += " AND role = ?";
-        params.push(role);
-      }
+  if (role && role !== "all") {
+    where += " AND role = ?";
+    params.push(role);
+  }
 
-      if (batch) {
-        where += " AND batch = ?";
-        params.push(batch);
-      }
+  if (batch && batch !== "all") {
+    where += " AND batch = ?";
+    params.push(batch);
+  }
 
-      // 🔢 total count
-      const totalRow = await env.DB.prepare(
-        `SELECT COUNT(*) as count FROM assets ${where}`
-      ).bind(...params).first();
+  // 🔹 TOTAL COUNT
+  const totalResult = await env.DB.prepare(
+    `SELECT COUNT(*) as count FROM assets ${where}`
+  ).bind(...params).first();
 
-      const total = totalRow.count;
+  // 🔹 PAGE DATA
+  const { results } = await env.DB.prepare(
+    `SELECT * FROM assets ${where}
+     ORDER BY created_at DESC
+     LIMIT ? OFFSET ?`
+  ).bind(...params, limit, offset).all();
 
-      // 📦 paginated data
-      const { results } = await env.DB.prepare(
-        `
-        SELECT * FROM assets
-        ${where}
-        ORDER BY created_at DESC
-        LIMIT ? OFFSET ?
-      `
-      ).bind(...params, limit, offset).all();
+  return new Response(
+    JSON.stringify({
+      data: results,
+      total: totalResult.count,
+      page,
+      limit
+    }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
 
-      return new Response(
-        JSON.stringify({
-          data: results,
-          total,
-          page,
-          limit,
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     /* ================== UPDATE ASSET ================== */
     if (url.pathname.startsWith("/assets/") && request.method === "PUT") {

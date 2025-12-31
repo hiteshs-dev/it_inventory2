@@ -47,8 +47,6 @@ const studentFields = document.getElementById("studentFields");
 const empFields = document.getElementById("empFields");
 
 const statTotal = document.getElementById("statTotal");
-const statStudents = document.getElementById("statStudents");
-const statEmployees = document.getElementById("statEmployees");
 const dashTable = document.getElementById("dashTable");
 const recentList = document.getElementById("recentList");
 
@@ -66,7 +64,6 @@ let editId = null;
 /* ================== LOGIN ================== */
 document.getElementById("loginForm").addEventListener("submit", e => {
   e.preventDefault();
-
   if (username.value === "admin" && password.value === "unix@2026") {
     loginModal.style.display = "none";
     navTabs.style.display = "flex";
@@ -91,7 +88,7 @@ function switchPage(page) {
   }
 }
 
-/* ================== ROLE / PLATFORM ================== */
+/* ================== FIELD TOGGLES ================== */
 function toggleFields() {
   studentFields.style.display = role.value === "student" ? "block" : "none";
   empFields.style.display = role.value === "employee" ? "block" : "none";
@@ -101,7 +98,6 @@ function toggleMacField() {
   macField.style.display = platform.value === "apple" ? "block" : "none";
   if (platform.value !== "apple") macAddress.value = "";
 }
-
 platform.addEventListener("change", toggleMacField);
 
 /* ================== FORM SUBMIT ================== */
@@ -152,18 +148,17 @@ assetForm.addEventListener("submit", async e => {
   assetForm.reset();
   toggleFields();
   toggleMacField();
-
   document.getElementById("submitBtn").innerText = "Submit Entry";
   switchPage("dashboard");
 });
 
-/* ================== DASHBOARD FETCH ================== */
+/* ================== LOAD ASSETS ================== */
 async function loadAssets(page = 1) {
   currentPage = page;
 
-  const search = searchInput?.value || "";
-  const roleVal = filterRole?.value || "";
-  const batchVal = filterBatch?.value || "";
+  const search = searchInput.value || "";
+  const roleVal = filterRole.value || "";
+  const batchVal = filterBatch.value || "";
 
   const res = await fetch(
     `${API_BASE}/assets?page=${page}&limit=${limit}&search=${search}&role=${roleVal}&batch=${batchVal}`
@@ -207,10 +202,8 @@ function renderTable(data) {
 /* ================== STATS ================== */
 function renderStats(total) {
   statTotal.innerText = total;
-
   const start = (currentPage - 1) * limit + 1;
   const end = Math.min(currentPage * limit, total);
-
   document.getElementById("pageInfo").innerText =
     `Showing ${start}–${end} of ${total}`;
 }
@@ -244,20 +237,43 @@ async function deleteAsset(id) {
 }
 
 async function editAsset(id) {
-  const res = await fetch(`${API_BASE}/assets?search=&role=&batch=`);
-  const { data } = await res.json();
-  const asset = data.find(a => a.id === id);
+  const res = await fetch(`${API_BASE}/assets?page=1&limit=1&search=&role=&batch=`);
+  const result = await res.json();
+  const asset = result.data.find(a => a.id === id);
   if (!asset) return;
 
   editId = id;
   switchPage("entry");
 
-  Object.entries(asset).forEach(([k, v]) => {
-    if (document.getElementById(k)) document.getElementById(k).value = v || "";
-  });
-
+  role.value = asset.role;
   toggleFields();
+
+  title.value = asset.title || "";
+  name.value = asset.name || "";
+  email.value = asset.email || "";
+  batch.value = asset.batch || "";
+  rollNo.value = asset.roll_no || "";
+  dept.value = asset.department || "";
+  designation.value = asset.designation || "";
+  empId.value = asset.emp_id || "";
+  studentLocation.value = asset.location || "";
+  empLocation.value = asset.location || "";
+
+  platform.value = asset.platform || "";
   toggleMacField();
+  macAddress.value = asset.mac_address || "";
+
+  assetDesc.value = asset.asset_desc || "";
+  asset_type.value = asset.asset_type || "";
+  assetId.value = asset.serial_no || "";
+  purchase_date.value = asset.purchase_date || "";
+  brand.value = asset.brand || "";
+  model.value = asset.model || "";
+  ram.value = asset.ram || "";
+  processor.value = asset.processor || "";
+  hdd.value = asset.storage || "";
+  remarks.value = asset.remarks || "";
+
   document.getElementById("submitBtn").innerText = "Update Entry";
 }
 
@@ -292,10 +308,10 @@ function drawCharts(data) {
 
 /* ================== EXCEL ================== */
 async function downloadExcel() {
-  const res = await fetch(`${API_BASE}/assets`);
+  const res = await fetch(`${API_BASE}/assets?page=1&limit=100000`);
   const result = await res.json();
 
-  const worksheet = XLSX.utils.json_to_sheet(result.data || result);
+  const worksheet = XLSX.utils.json_to_sheet(result.data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Assets");
 
