@@ -28,7 +28,7 @@ export default {
     if (url.pathname === "/assets" && request.method === "POST") {
       const data = await request.json();
 
-      // ✅ DUPLICATE SERIAL CHECK
+      // ✅ Duplicate serial check
       const { results: existing } = await env.DB.prepare(
         "SELECT id FROM assets WHERE serial_no = ?"
       ).bind(data.serial_no).all();
@@ -37,7 +37,7 @@ export default {
         return new Response(
           JSON.stringify({
             success: false,
-            error: "Serial number already exists"
+            error: "Serial number already exists",
           }),
           { status: 409, headers: corsHeaders }
         );
@@ -88,36 +88,58 @@ export default {
       );
     }
 
-    /* ================== GET ASSETS ================== */
+    /* ================== GET ASSETS (PAGINATED) ================== */
     if (url.pathname === "/assets" && request.method === "GET") {
       const search = url.searchParams.get("search") || "";
       const role = url.searchParams.get("role");
       const batch = url.searchParams.get("batch");
 
-      let query = "SELECT * FROM assets WHERE 1=1";
+      const page = parseInt(url.searchParams.get("page") || "1");
+      const limit = parseInt(url.searchParams.get("limit") || "50");
+      const offset = (page - 1) * limit;
+
+      let where = "WHERE 1=1";
       const params = [];
 
       if (search) {
-        query += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
+        where += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
         params.push(`%${search}%`, `%${search}%`, `%${search}%`);
       }
 
       if (role) {
-        query += " AND role = ?";
+        where += " AND role = ?";
         params.push(role);
       }
 
       if (batch) {
-        query += " AND batch = ?";
+        where += " AND batch = ?";
         params.push(batch);
       }
 
-      query += " ORDER BY created_at DESC";
+      // 🔢 total count
+      const totalRow = await env.DB.prepare(
+        `SELECT COUNT(*) as count FROM assets ${where}`
+      ).bind(...params).first();
 
-      const { results } = await env.DB.prepare(query).bind(...params).all();
+      const total = totalRow.count;
+
+      // 📦 paginated data
+      const { results } = await env.DB.prepare(
+        `
+        SELECT * FROM assets
+        ${where}
+        ORDER BY created_at DESC
+        LIMIT ? OFFSET ?
+      `
+      ).bind(...params, limit, offset).all();
 
       return new Response(
-        JSON.stringify(results),
+        JSON.stringify({
+          data: results,
+          total,
+          page,
+          limit,
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -127,7 +149,7 @@ export default {
       const id = url.pathname.split("/")[2];
       const data = await request.json();
 
-      // ✅ DUPLICATE SERIAL CHECK (IGNORE SAME ID)
+      // ✅ Duplicate serial check (ignore same id)
       const { results: dup } = await env.DB.prepare(
         "SELECT id FROM assets WHERE serial_no = ? AND id != ?"
       ).bind(data.serial_no, id).all();
@@ -136,7 +158,7 @@ export default {
         return new Response(
           JSON.stringify({
             success: false,
-            error: "Serial number already exists"
+            error: "Serial number already exists",
           }),
           { status: 409, headers: corsHeaders }
         );
