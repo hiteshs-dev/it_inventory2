@@ -88,55 +88,36 @@ export default {
       );
     }
 
-    /* ================== GET ASSETS (PAGINATED) ================== */
+    /* ================== GET ASSETS ================== */
     if (url.pathname === "/assets" && request.method === "GET") {
       const search = url.searchParams.get("search") || "";
       const role = url.searchParams.get("role");
       const batch = url.searchParams.get("batch");
-      const page = Number(url.searchParams.get("page") || 1);
-      const limit = Number(url.searchParams.get("limit") || 50);
-      const offset = (page - 1) * limit;
 
-      let where = "WHERE 1=1";
+      let query = "SELECT * FROM assets WHERE 1=1";
       const params = [];
 
       if (search) {
-        where += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
+        query += " AND (name LIKE ? OR serial_no LIKE ? OR asset_type LIKE ?)";
         params.push(`%${search}%`, `%${search}%`, `%${search}%`);
       }
 
       if (role) {
-        where += " AND role = ?";
+        query += " AND role = ?";
         params.push(role);
       }
 
       if (batch) {
-        where += " AND batch = ?";
+        query += " AND batch = ?";
         params.push(batch);
       }
 
-      // 🔢 TOTAL COUNT
-      const totalRes = await env.DB.prepare(
-        `SELECT COUNT(*) as total FROM assets ${where}`
-      ).bind(...params).first();
+      query += " ORDER BY created_at DESC";
 
-      const total = totalRes.total;
-
-      // 📄 PAGINATED DATA
-      const { results } = await env.DB.prepare(`
-        SELECT * FROM assets
-        ${where}
-        ORDER BY created_at DESC
-        LIMIT ? OFFSET ?
-      `).bind(...params, limit, offset).all();
+      const { results } = await env.DB.prepare(query).bind(...params).all();
 
       return new Response(
-        JSON.stringify({
-          data: results,
-          total,
-          page,
-          limit
-        }),
+        JSON.stringify(results),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -146,7 +127,7 @@ export default {
       const id = url.pathname.split("/")[2];
       const data = await request.json();
 
-      // ✅ DUPLICATE SERIAL CHECK (IGNORE SAME RECORD)
+      // ✅ DUPLICATE SERIAL CHECK (IGNORE SAME ID)
       const { results: dup } = await env.DB.prepare(
         "SELECT id FROM assets WHERE serial_no = ? AND id != ?"
       ).bind(data.serial_no, id).all();
@@ -244,7 +225,7 @@ export default {
         headers: {
           ...corsHeaders,
           "Content-Type": "text/csv",
-          "Content-Disposition": `attachment; filename="assets_${role}_${batch || "all"}.csv"`
+          "Content-Disposition": `attachment; filename="assets_${role}_${batch || "all"}.csv"`,
         },
       });
     }
