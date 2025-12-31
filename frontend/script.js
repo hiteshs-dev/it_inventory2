@@ -61,6 +61,9 @@ let roleChart = null;
 let batchChart = null;
 let editId = null;
 
+let currentPage = 1;
+const limit = 50; // records per page
+
 /* ================== LOGIN ================== */
 document.getElementById("loginForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -335,6 +338,58 @@ async function downloadSpecific(role, batch) {
   link.download = `${role}_${batch || "all"}_assets.csv`;
   link.click();
 }
+
+/* ================== Fetch + calculate pages ================== */
+async function loadAssets(page = 1) {
+  currentPage = page;
+
+  const search = document.getElementById("searchInput")?.value || "";
+  const role = document.getElementById("filterRole")?.value || "";
+  const batch = document.getElementById("filterBatch")?.value || "";
+
+  const res = await fetch(
+    `/assets?page=${page}&limit=${limit}&search=${search}&role=${role}&batch=${batch}`
+  );
+
+  const result = await res.json();
+
+  renderTable(result.data);                // existing function
+  renderPagination(result.total, page);    // 👈 THIS IS NEW
+}
+
+/* ================== Automatic page calculation ================== */
+
+function renderPagination(total, page) {
+  const totalPages = Math.ceil(total / limit);
+  const container = document.getElementById("pagination");
+
+  container.innerHTML = "";
+
+  // Previous
+  if (page > 1) {
+    container.innerHTML += `
+      <button onclick="loadAssets(${page - 1})">‹</button>
+    `;
+  }
+
+  // Page numbers (max 100 pages supported automatically)
+  for (let i = 1; i <= totalPages; i++) {
+    if (i > page - 3 && i < page + 3) {
+      container.innerHTML += `
+        <button class="${i === page ? "active" : ""}"
+                onclick="loadAssets(${i})">${i}</button>
+      `;
+    }
+  }
+
+  // Next
+  if (page < totalPages) {
+    container.innerHTML += `
+      <button onclick="loadAssets(${page + 1})">›</button>
+    `;
+  }
+}
+  
 
 /* ================== INIT ================== */
 toggleFields();
