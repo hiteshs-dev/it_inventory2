@@ -43,6 +43,10 @@ const processor = document.getElementById("processor");
 const hdd = document.getElementById("hdd");
 const remarks = document.getElementById("remarks");
 
+const platform = document.getElementById("platform");
+const macAddress = document.getElementById("macAddress");
+const macField = document.getElementById("macField");
+
 const studentFields = document.getElementById("studentFields");
 const empFields = document.getElementById("empFields");
 
@@ -66,8 +70,8 @@ let batchChart = null;
 document.getElementById("loginForm").addEventListener("submit", e => {
   e.preventDefault();
 
-  const user = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
+  const user = username.value;
+  const pass = password.value;
 
   if (user === "admin" && pass === "unix@2026") {
     loginModal.style.display = "none";
@@ -90,14 +94,20 @@ function switchPage(page) {
 
 /* ================== ROLE TOGGLE ================== */
 function toggleFields() {
-  if (role.value === "student") {
-    studentFields.style.display = "block";
-    empFields.style.display = "none";
+  studentFields.style.display = role.value === "student" ? "block" : "none";
+  empFields.style.display = role.value === "employee" ? "block" : "none";
+}
+
+/* ================== PLATFORM TOGGLE ================== */
+function toggleMacField() {
+  if (platform.value === "apple") {
+    macField.style.display = "block";
   } else {
-    studentFields.style.display = "none";
-    empFields.style.display = "block";
+    macField.style.display = "none";
+    macAddress.value = "";
   }
 }
+platform.addEventListener("change", toggleMacField);
 
 /* ================== SUBMIT FORM ================== */
 assetForm.addEventListener("submit", async e => {
@@ -108,15 +118,17 @@ assetForm.addEventListener("submit", async e => {
     title: title.value,
     name: name.value,
     email: email.value,
+
+    platform: platform.value,
+    mac_address: platform.value === "apple" ? macAddress.value : "",
+
     batch: role.value === "student" ? batch.value : "",
     roll_no: role.value === "student" ? rollNo.value : "",
     department: role.value === "employee" ? dept.value : "",
     designation: role.value === "employee" ? designation.value : "",
     emp_id: role.value === "employee" ? empId.value : "",
-    location:
-      role.value === "student"
-        ? studentLocation.value
-        : empLocation.value,
+    location: role.value === "student" ? studentLocation.value : empLocation.value,
+
     asset_desc: assetDesc.value,
     asset_type: asset_type.value,
     serial_no: assetId.value,
@@ -137,7 +149,6 @@ assetForm.addEventListener("submit", async e => {
     });
 
     const result = await res.json();
-
     if (!res.ok || !result.success) {
       alert("API ERROR:\n" + JSON.stringify(result));
       return;
@@ -146,6 +157,7 @@ assetForm.addEventListener("submit", async e => {
     alert("✅ Asset Added Successfully");
     assetForm.reset();
     toggleFields();
+    toggleMacField();
     loadDashboard();
 
   } catch (err) {
@@ -180,6 +192,8 @@ function renderDashboard(data) {
         <td>${d.role}</td>
         <td>${d.asset_type}</td>
         <td>${d.serial_no}</td>
+        <td>${d.platform || "-"}</td>
+        <td>${d.mac_address || "-"}</td>
         <td>
           <button onclick="editAsset(${d.id})">✏️</button>
           <button onclick="deleteAsset(${d.id})">🗑</button>
@@ -193,6 +207,8 @@ function renderDashboard(data) {
 
 /* ================== CHARTS ================== */
 function drawCharts(data) {
+  if (!roleChartCtx || !batchChartCtx) return;
+
   const roleCount = {};
   const batchCount = {};
 
@@ -201,17 +217,14 @@ function drawCharts(data) {
     if (d.batch) batchCount[d.batch] = (batchCount[d.batch] || 0) + 1;
   });
 
-  if (roleChart) roleChart.destroy();
-  if (batchChart) batchChart.destroy();
+  roleChart?.destroy();
+  batchChart?.destroy();
 
   roleChart = new Chart(roleChartCtx, {
     type: "doughnut",
     data: {
       labels: Object.keys(roleCount),
-      datasets: [{
-        data: Object.values(roleCount),
-        backgroundColor: ["#2563eb", "#9333ea"]
-      }]
+      datasets: [{ data: Object.values(roleCount) }]
     }
   });
 
@@ -219,18 +232,14 @@ function drawCharts(data) {
     type: "bar",
     data: {
       labels: Object.keys(batchCount),
-      datasets: [{
-        label: "Assets",
-        data: Object.values(batchCount),
-        backgroundColor: "#2563eb"
-      }]
+      datasets: [{ data: Object.values(batchCount) }]
     }
   });
 }
 
 /* ================== SEARCH / FILTER ================== */
 async function applyFilters() {
-  const q = searchInput.value.toLowerCase();
+  const q = (searchInput.value || "").toLowerCase();
   const roleVal = filterRole.value;
   const batchVal = filterBatch.value;
 
@@ -239,31 +248,25 @@ async function applyFilters() {
 
   if (q) {
     data = data.filter(d =>
-      d.name.toLowerCase().includes(q) ||
-      d.serial_no.toLowerCase().includes(q)
+      (d.name || "").toLowerCase().includes(q) ||
+      (d.serial_no || "").toLowerCase().includes(q)
     );
   }
 
-  if (roleVal !== "all") {
-    data = data.filter(d => d.role === roleVal);
-  }
-
-  if (batchVal !== "all") {
-    data = data.filter(d => d.batch === batchVal);
-  }
+  if (roleVal !== "all") data = data.filter(d => d.role === roleVal);
+  if (batchVal !== "all") data = data.filter(d => d.batch === batchVal);
 
   renderDashboard(data);
 }
 
-/* ================== DELETE (API REQUIRED) ================== */
-async function deleteAsset(id) {
-  alert("Delete API not added yet");
+/* ================== PLACEHOLDERS ================== */
+function deleteAsset() {
+  alert("Delete API not enabled yet");
 }
-
-/* ================== EDIT (UI ONLY) ================== */
-async function editAsset(id) {
-  alert("Edit API not added yet");
+function editAsset() {
+  alert("Edit API not enabled yet");
 }
 
 /* ================== INIT ================== */
 toggleFields();
+toggleMacField();

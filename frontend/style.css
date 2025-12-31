@@ -264,6 +264,36 @@ textarea:focus {
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
 }
+.dashboard-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.dashboard-toolbar input,
+.dashboard-toolbar select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text-main);
+  min-width: 180px;
+}
+
+.dashboard-toolbar input {
+  flex: 1;
+}
+
+.dashboard-toolbar button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
 
 /* =====================
    UTILITIES
