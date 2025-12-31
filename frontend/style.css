@@ -2,13 +2,13 @@
    THEME VARIABLES
 ===================== */
 :root {
-  --primary: #2563eb;          /* Professional Blue */
+  --primary: #2563eb;
   --primary-hover: #1d4ed8;
-  --bg: #f8fafc;               /* Page background */
-  --card: #ffffff;             /* Cards */
-  --text-main: #0f172a;        /* Main text */
-  --text-muted: #64748b;       /* Muted text */
-  --border: #e2e8f0;           /* Light border */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
   --shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
@@ -17,7 +17,7 @@
 ===================== */
 * {
   box-sizing: border-box;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 body {
@@ -34,11 +34,11 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2.5rem;
-  background: #ffffff;
+  background: #fff;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
 }
 
 .brand {
@@ -52,21 +52,26 @@ header {
 /* =====================
    NAVIGATION
 ===================== */
+.nav-tabs {
+  display: flex;
+  gap: 20px;
+}
+
 .nav-tabs button {
   background: none;
   border: none;
   color: var(--text-muted);
-  margin-left: 1.5rem;
   cursor: pointer;
   font-size: 0.95rem;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
 }
 
 .nav-tabs button:hover {
   color: var(--primary);
 }
 
-.nav-tabs .active {
+.nav-tabs button.active {
   color: var(--primary);
   border-bottom: 2px solid var(--primary);
 }
@@ -119,21 +124,21 @@ header {
 }
 
 label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 6px;
+  text-transform: uppercase;
 }
 
 input,
 select,
 textarea {
   padding: 11px 12px;
-  background: #ffffff;
-  border: 1px solid var(--border);
   border-radius: 8px;
+  border: 1px solid var(--border);
   font-size: 0.9rem;
-  transition: border 0.2s, box-shadow 0.2s;
+  background: #fff;
 }
 
 input:focus,
@@ -141,29 +146,53 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
 }
 
 /* =====================
    BUTTONS
 ===================== */
-.btn-submit,
-.btn-excel {
+.btn-submit {
   background: var(--primary);
   border: none;
-  padding: 11px 14px;
-  color: #ffffff;
-  border-radius: 8px;
+  padding: 12px;
+  color: #fff;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: background 0.2s, transform 0.1s;
 }
 
-.btn-submit:hover,
-.btn-excel:hover {
+.btn-submit:hover {
   background: var(--primary-hover);
-  transform: translateY(-1px);
+}
+
+/* =====================
+   EXCEL / MASTER DB
+===================== */
+.cloud-action {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btn-excel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-excel:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #eef2ff;
 }
 
 /* =====================
@@ -172,14 +201,15 @@ textarea:focus {
 #loginModal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.65);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 50;
 }
 
 .login-box {
-  background: #ffffff;
+  background: #fff;
   padding: 2.5rem;
   border-radius: 18px;
   width: 320px;
@@ -192,31 +222,28 @@ textarea:focus {
 }
 
 /* =====================
-   TABLE
+   DASHBOARD TOOLBAR
 ===================== */
-.table-wrapper {
-  overflow-x: auto;
-  margin-top: 1rem;
+.dashboard-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
+.dashboard-toolbar input,
+.dashboard-toolbar select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  min-width: 180px;
 }
 
-.data-table th {
-  text-align: left;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 12px;
-  border-bottom: 2px solid var(--border);
-}
-
-.data-table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.9rem;
+.dashboard-toolbar input {
+  flex: 1;
 }
 
 /* =====================
@@ -249,6 +276,34 @@ textarea:focus {
 }
 
 /* =====================
+   TABLE
+===================== */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.data-table th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 12px;
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+/* =====================
    CHARTS
 ===================== */
 .charts-container {
@@ -263,36 +318,6 @@ textarea:focus {
   border-radius: 16px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-}
-.dashboard-toolbar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  background: var(--card-bg);
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-}
-
-.dashboard-toolbar input,
-.dashboard-toolbar select {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--input-bg);
-  color: var(--text-main);
-  min-width: 180px;
-}
-
-.dashboard-toolbar input {
-  flex: 1;
-}
-
-.dashboard-toolbar button {
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 600;
 }
 
 /* =====================

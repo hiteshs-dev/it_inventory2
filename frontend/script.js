@@ -88,9 +88,24 @@ function logout() {
 
 /* ================== PAGE SWITCH ================== */
 function switchPage(page) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p =>
+    p.classList.remove("active")
+  );
+
+  document.querySelectorAll(".nav-btn").forEach(b =>
+    b.classList.remove("active")
+  );
+
   document.getElementById(`page-${page}`).classList.add("active");
+
+  if (page === "entry") {
+    navTabs.children[0].classList.add("active");
+  } else {
+    navTabs.children[1].classList.add("active");
+    loadDashboard();
+  }
 }
+
 
 /* ================== ROLE TOGGLE ================== */
 function toggleFields() {
@@ -265,6 +280,12 @@ function deleteAsset() {
 }
 function editAsset() {
   alert("Edit API not enabled yet");
+}
+
+/* ================== DOWNLOAD EXCEL ================== */
+function downloadSpecific(role, batch) {
+  const url = `${API_BASE}/export?role=${role}&batch=${batch}`;
+  window.open(url, "_blank");
 }
 
 /* ================== INIT ================== */
