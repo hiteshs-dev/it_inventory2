@@ -68,7 +68,7 @@ document.getElementById("loginForm").addEventListener("submit", e => {
   if (username.value === "admin" && password.value === "unix@2026") {
     loginModal.style.display = "none";
     navTabs.style.display = "flex";
-    loadDashboard();
+    switchPage("entry");
   } else {
     loginError.style.display = "block";
   }
@@ -81,7 +81,12 @@ function switchPage(page) {
 
   document.getElementById(`page-${page}`).classList.add("active");
 
-  if (page === "dashboard") loadDashboard();
+  if (page === "entry") {
+    navTabs.children[0].classList.add("active");
+  } else {
+    navTabs.children[1].classList.add("active");
+    loadDashboard();
+  }
 }
 
 /* ================== ROLE / PLATFORM TOGGLE ================== */
@@ -94,12 +99,13 @@ function toggleMacField() {
   macField.style.display = platform.value === "apple" ? "block" : "none";
   if (platform.value !== "apple") macAddress.value = "";
 }
-
 platform.addEventListener("change", toggleMacField);
 
 /* ================== FORM SUBMIT (ADD / UPDATE) ================== */
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
+
+  const isEdit = !!editId;
 
   const payload = {
     role: role.value,
@@ -126,8 +132,11 @@ assetForm.addEventListener("submit", async e => {
     remarks: remarks.value
   };
 
-  const url = editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`;
-  const method = editId ? "PUT" : "POST";
+  const url = isEdit
+    ? `${API_BASE}/assets/${editId}`
+    : `${API_BASE}/assets`;
+
+  const method = isEdit ? "PUT" : "POST";
 
   const res = await fetch(url, {
     method,
@@ -138,7 +147,7 @@ assetForm.addEventListener("submit", async e => {
   const result = await res.json();
   if (!result.success) return alert("Operation failed");
 
-  alert(editId ? "✅ Asset Updated" : "✅ Asset Added");
+  alert(isEdit ? "✅ Asset Updated" : "✅ Asset Added");
 
   editId = null;
   assetForm.reset();
@@ -201,108 +210,124 @@ async function deleteAsset(id) {
 async function editAsset(id) {
   const res = await fetch(`${API_BASE}/assets`);
   const data = await res.json();
-  const a = data.find(x => x.id === id);
+  const asset = data.find(a => a.id === id);
+  if (!asset) return;
 
   editId = id;
+  switchPage("entry");
 
-  role.value = a.role;
+  role.value = asset.role;
   toggleFields();
 
-  title.value = a.title;
-  name.value = a.name;
-  email.value = a.email;
-  batch.value = a.batch;
-  rollNo.value = a.roll_no;
-  dept.value = a.department;
-  designation.value = a.designation;
-  empId.value = a.emp_id;
-  studentLocation.value = a.location;
-  empLocation.value = a.location;
+  title.value = asset.title;
+  name.value = asset.name;
+  email.value = asset.email;
+  batch.value = asset.batch || "";
+  rollNo.value = asset.roll_no || "";
+  dept.value = asset.department || "";
+  designation.value = asset.designation || "";
+  empId.value = asset.emp_id || "";
+  studentLocation.value = asset.location || "";
+  empLocation.value = asset.location || "";
 
-  platform.value = a.platform || "";
+  platform.value = asset.platform || "";
   toggleMacField();
-  macAddress.value = a.mac_address || "";
+  macAddress.value = asset.mac_address || "";
 
-  assetDesc.value = a.asset_desc;
-  asset_type.value = a.asset_type;
-  assetId.value = a.serial_no;
-  purchase_date.value = a.purchase_date;
-  brand.value = a.brand;
-  model.value = a.model;
-  ram.value = a.ram;
-  processor.value = a.processor;
-  hdd.value = a.storage;
-  remarks.value = a.remarks;
+  assetDesc.value = asset.asset_desc;
+  asset_type.value = asset.asset_type;
+  assetId.value = asset.serial_no;
+  purchase_date.value = asset.purchase_date;
+  brand.value = asset.brand;
+  model.value = asset.model;
+  ram.value = asset.ram;
+  processor.value = asset.processor;
+  hdd.value = asset.storage;
+  remarks.value = asset.remarks;
 
-  document.getElementById("submitBtn").innerText = "Update Asset";
+  document.getElementById("submitBtn").innerText = "Update Entry";
 }
 
-/* ================== SEARCH ================== */
+/* ================== SEARCH & FILTER ================== */
 async function applyFilters() {
-  const q = searchInput.value.toLowerCase();
+  const q = (searchInput.value || "").toLowerCase();
+  const roleVal = filterRole.value;
+  const batchVal = filterBatch.value;
+
   const res = await fetch(`${API_BASE}/assets`);
   let data = await res.json();
 
-  if (q) data = data.filter(d => d.name.toLowerCase().includes(q));
+  if (q) {
+    data = data.filter(d =>
+      (d.name || "").toLowerCase().includes(q) ||
+      (d.serial_no || "").toLowerCase().includes(q) ||
+      (d.asset_type || "").toLowerCase().includes(q)
+    );
+  }
+
+  if (roleVal !== "all") data = data.filter(d => d.role === roleVal);
+  if (batchVal !== "all") data = data.filter(d => d.batch === batchVal);
+
   renderDashboard(data);
 }
 
-/* ================== EXCEL DOWNLOAD ================== */
-async function downloadExcel() {
-  try {
-    const res = await fetch(`${API_BASE}/assets`);
-    let data = await res.json();
+/* ================== CHARTS ================== */
+function drawCharts(data) {
+  if (!roleChartCtx || !batchChartCtx) return;
 
-    // Apply current filters
-    const q = (searchInput.value || "").toLowerCase();
-    const roleVal = filterRole.value;
-    const batchVal = filterBatch.value;
+  const roleCount = {};
+  const batchCount = {};
 
-    if (q) {
-      data = data.filter(d =>
-        (d.name || "").toLowerCase().includes(q) ||
-        (d.serial_no || "").toLowerCase().includes(q)
-      );
+  data.forEach(d => {
+    roleCount[d.role] = (roleCount[d.role] || 0) + 1;
+    if (d.batch) batchCount[d.batch] = (batchCount[d.batch] || 0) + 1;
+  });
+
+  roleChart?.destroy();
+  batchChart?.destroy();
+
+  roleChart = new Chart(roleChartCtx, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(roleCount),
+      datasets: [{ data: Object.values(roleCount) }]
     }
+  });
 
-    if (roleVal !== "all") data = data.filter(d => d.role === roleVal);
-    if (batchVal !== "all") data = data.filter(d => d.batch === batchVal);
-
-    if (!data.length) {
-      alert("No data to export");
-      return;
+  batchChart = new Chart(batchChartCtx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(batchCount),
+      datasets: [{ data: Object.values(batchCount) }]
     }
-
-    // Clean Excel data
-    const excelData = data.map(d => ({
-      Name: d.name,
-      Role: d.role,
-      Email: d.email,
-      Platform: d.platform || "",
-      "MAC Address": d.mac_address || "",
-      Asset: d.asset_type,
-      "Serial No": d.serial_no,
-      Brand: d.brand,
-      Model: d.model,
-      RAM: d.ram,
-      Processor: d.processor,
-      Storage: d.storage,
-      Location: d.location,
-      Remarks: d.remarks,
-      "Purchase Date": d.purchase_date
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Assets");
-
-    XLSX.writeFile(workbook, "ITM_Inventory.xlsx");
-
-  } catch (err) {
-    alert("Excel download failed");
-  }
+  });
 }
 
+/* ================== EXCEL DOWNLOAD (DASHBOARD) ================== */
+async function downloadExcel() {
+  const res = await fetch(`${API_BASE}/assets`);
+  let data = await res.json();
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Assets");
+
+  XLSX.writeFile(workbook, "ITM_Inventory.xlsx");
+}
+
+/* ================== SPECIFIC CSV DOWNLOAD ================== */
+async function downloadSpecific(role, batch) {
+  let url = `${API_BASE}/export?role=${role}`;
+  if (batch && batch !== "all") url += `&batch=${batch}`;
+
+  const res = await fetch(url);
+  const blob = await res.blob();
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${role}_${batch || "all"}_assets.csv`;
+  link.click();
+}
 
 /* ================== INIT ================== */
 toggleFields();
