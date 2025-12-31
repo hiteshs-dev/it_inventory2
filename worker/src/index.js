@@ -107,19 +107,48 @@ export default {
       );
     }
 
-    /* ================== DELETE ASSET ================== */
-    if (url.pathname.startsWith("/assets/") && request.method === "DELETE") {
-      const id = url.pathname.split("/")[2];
+    /* ---------------- DELETE ASSET ---------------- */
+if (url.pathname.startsWith("/assets/") && request.method === "DELETE") {
+  const id = url.pathname.split("/")[2];
 
-      await env.DB.prepare("DELETE FROM assets WHERE id = ?")
-        .bind(id)
-        .run();
+  await env.DB.prepare(
+    "DELETE FROM assets WHERE id = ?"
+  ).bind(id).run();
 
-      return new Response(
-        JSON.stringify({ success: true }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+  return new Response(
+    JSON.stringify({ success: true }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
+
+/* ---------------- UPDATE ASSET ---------------- */
+if (url.pathname.startsWith("/assets/") && request.method === "PUT") {
+  const id = url.pathname.split("/")[2];
+  const data = await request.json();
+
+  await env.DB.prepare(`
+    UPDATE assets SET
+      role = ?, title = ?, name = ?, email = ?,
+      batch = ?, roll_no = ?, department = ?, designation = ?, emp_id = ?, location = ?,
+      platform = ?, mac_address = ?,
+      asset_desc = ?, asset_type = ?, serial_no = ?, purchase_date = ?,
+      brand = ?, model = ?, ram = ?, processor = ?, storage = ?, remarks = ?
+    WHERE id = ?
+  `).bind(
+    data.role, data.title, data.name, data.email,
+    data.batch, data.roll_no, data.department, data.designation, data.emp_id, data.location,
+    data.platform, data.mac_address,
+    data.asset_desc, data.asset_type, data.serial_no, data.purchase_date,
+    data.brand, data.model, data.ram, data.processor, data.storage, data.remarks,
+    id
+  ).run();
+
+  return new Response(
+    JSON.stringify({ success: true }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
+
 
     /* ================== EXPORT CSV (EXCEL) ================== */
     if (url.pathname === "/export" && request.method === "GET") {

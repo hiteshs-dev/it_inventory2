@@ -1,11 +1,6 @@
 /* ================== GLOBAL ERROR DEBUG ================== */
-window.onerror = function (msg, src, line, col, err) {
-  alert(
-    "JS ERROR:\n" +
-    msg +
-    "\nLine: " + line +
-    "\nColumn: " + col
-  );
+window.onerror = function (msg, src, line, col) {
+  alert("JS ERROR:\n" + msg + "\nLine: " + line + "\nColumn: " + col);
 };
 
 /* ================== API ================== */
@@ -15,7 +10,6 @@ const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 const loginModal = document.getElementById("loginModal");
 const navTabs = document.getElementById("navTabs");
 const loginError = document.getElementById("loginError");
-
 const assetForm = document.getElementById("assetForm");
 
 const role = document.getElementById("role");
@@ -65,15 +59,13 @@ const batchChartCtx = document.getElementById("batchChart");
 
 let roleChart = null;
 let batchChart = null;
+let editId = null;
 
 /* ================== LOGIN ================== */
 document.getElementById("loginForm").addEventListener("submit", e => {
   e.preventDefault();
 
-  const user = username.value;
-  const pass = password.value;
-
-  if (user === "admin" && pass === "unix@2026") {
+  if (username.value === "admin" && password.value === "unix@2026") {
     loginModal.style.display = "none";
     navTabs.style.display = "flex";
     loadDashboard();
@@ -82,48 +74,30 @@ document.getElementById("loginForm").addEventListener("submit", e => {
   }
 });
 
-function logout() {
-  location.reload();
-}
-
 /* ================== PAGE SWITCH ================== */
 function switchPage(page) {
-  document.querySelectorAll(".page").forEach(p =>
-    p.classList.remove("active")
-  );
-
-  document.querySelectorAll(".nav-btn").forEach(b =>
-    b.classList.remove("active")
-  );
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
 
   document.getElementById(`page-${page}`).classList.add("active");
 
-  if (page === "entry") {
-    navTabs.children[0].classList.add("active");
-  } else {
-    navTabs.children[1].classList.add("active");
-    loadDashboard();
-  }
+  if (page === "dashboard") loadDashboard();
 }
 
-/* ================== ROLE TOGGLE ================== */
+/* ================== ROLE / PLATFORM TOGGLE ================== */
 function toggleFields() {
   studentFields.style.display = role.value === "student" ? "block" : "none";
   empFields.style.display = role.value === "employee" ? "block" : "none";
 }
 
-/* ================== PLATFORM TOGGLE ================== */
 function toggleMacField() {
-  if (platform.value === "apple") {
-    macField.style.display = "block";
-  } else {
-    macField.style.display = "none";
-    macAddress.value = "";
-  }
+  macField.style.display = platform.value === "apple" ? "block" : "none";
+  if (platform.value !== "apple") macAddress.value = "";
 }
+
 platform.addEventListener("change", toggleMacField);
 
-/* ================== SUBMIT FORM ================== */
+/* ================== FORM SUBMIT (ADD / UPDATE) ================== */
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -132,17 +106,14 @@ assetForm.addEventListener("submit", async e => {
     title: title.value,
     name: name.value,
     email: email.value,
-
     platform: platform.value,
     mac_address: platform.value === "apple" ? macAddress.value : "",
-
     batch: role.value === "student" ? batch.value : "",
     roll_no: role.value === "student" ? rollNo.value : "",
     department: role.value === "employee" ? dept.value : "",
     designation: role.value === "employee" ? designation.value : "",
     emp_id: role.value === "employee" ? empId.value : "",
     location: role.value === "student" ? studentLocation.value : empLocation.value,
-
     asset_desc: assetDesc.value,
     asset_type: asset_type.value,
     serial_no: assetId.value,
@@ -155,38 +126,35 @@ assetForm.addEventListener("submit", async e => {
     remarks: remarks.value
   };
 
-  try {
-    const res = await fetch(`${API_BASE}/assets`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+  const url = editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`;
+  const method = editId ? "PUT" : "POST";
 
-    const result = await res.json();
-    if (!res.ok || !result.success) {
-      alert("API ERROR:\n" + JSON.stringify(result));
-      return;
-    }
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-    alert("✅ Asset Added Successfully");
-    assetForm.reset();
-    toggleFields();
-    toggleMacField();
-    loadDashboard();
+  const result = await res.json();
+  if (!result.success) return alert("Operation failed");
 
-  } catch (err) {
-    alert("❌ FETCH ERROR:\n" + err.message);
-  }
+  alert(editId ? "✅ Asset Updated" : "✅ Asset Added");
+
+  editId = null;
+  assetForm.reset();
+  toggleFields();
+  toggleMacField();
+  document.getElementById("submitBtn").innerText = "Submit Entry";
+  loadDashboard();
 });
 
-/* ================== LOAD DASHBOARD ================== */
+/* ================== DASHBOARD ================== */
 async function loadDashboard() {
   const res = await fetch(`${API_BASE}/assets`);
   const data = await res.json();
   renderDashboard(data);
 }
 
-/* ================== RENDER DASHBOARD ================== */
 function renderDashboard(data) {
   statTotal.innerText = data.length;
   statStudents.innerText = data.filter(d => d.role === "student").length;
@@ -219,72 +187,64 @@ function renderDashboard(data) {
   drawCharts(data);
 }
 
-/* ================== CHARTS ================== */
-function drawCharts(data) {
-  if (!roleChartCtx || !batchChartCtx) return;
+/* ================== EDIT / DELETE ================== */
+async function deleteAsset(id) {
+  if (!confirm("Delete this asset?")) return;
 
-  const roleCount = {};
-  const batchCount = {};
+  const res = await fetch(`${API_BASE}/assets/${id}`, { method: "DELETE" });
+  const result = await res.json();
 
-  data.forEach(d => {
-    roleCount[d.role] = (roleCount[d.role] || 0) + 1;
-    if (d.batch) batchCount[d.batch] = (batchCount[d.batch] || 0) + 1;
-  });
-
-  roleChart?.destroy();
-  batchChart?.destroy();
-
-  roleChart = new Chart(roleChartCtx, {
-    type: "doughnut",
-    data: {
-      labels: Object.keys(roleCount),
-      datasets: [{ data: Object.values(roleCount) }]
-    }
-  });
-
-  batchChart = new Chart(batchChartCtx, {
-    type: "bar",
-    data: {
-      labels: Object.keys(batchCount),
-      datasets: [{ data: Object.values(batchCount) }]
-    }
-  });
+  if (!result.success) return alert("Delete failed");
+  loadDashboard();
 }
 
-/* ================== SEARCH / FILTER ================== */
-async function applyFilters() {
-  const q = (searchInput.value || "").toLowerCase();
-  const roleVal = filterRole.value;
-  const batchVal = filterBatch.value;
+async function editAsset(id) {
+  const res = await fetch(`${API_BASE}/assets`);
+  const data = await res.json();
+  const a = data.find(x => x.id === id);
 
+  editId = id;
+
+  role.value = a.role;
+  toggleFields();
+
+  title.value = a.title;
+  name.value = a.name;
+  email.value = a.email;
+  batch.value = a.batch;
+  rollNo.value = a.roll_no;
+  dept.value = a.department;
+  designation.value = a.designation;
+  empId.value = a.emp_id;
+  studentLocation.value = a.location;
+  empLocation.value = a.location;
+
+  platform.value = a.platform || "";
+  toggleMacField();
+  macAddress.value = a.mac_address || "";
+
+  assetDesc.value = a.asset_desc;
+  asset_type.value = a.asset_type;
+  assetId.value = a.serial_no;
+  purchase_date.value = a.purchase_date;
+  brand.value = a.brand;
+  model.value = a.model;
+  ram.value = a.ram;
+  processor.value = a.processor;
+  hdd.value = a.storage;
+  remarks.value = a.remarks;
+
+  document.getElementById("submitBtn").innerText = "Update Asset";
+}
+
+/* ================== SEARCH ================== */
+async function applyFilters() {
+  const q = searchInput.value.toLowerCase();
   const res = await fetch(`${API_BASE}/assets`);
   let data = await res.json();
 
-  if (q) {
-    data = data.filter(d =>
-      (d.name || "").toLowerCase().includes(q) ||
-      (d.serial_no || "").toLowerCase().includes(q)
-    );
-  }
-
-  if (roleVal !== "all") data = data.filter(d => d.role === roleVal);
-  if (batchVal !== "all") data = data.filter(d => d.batch === batchVal);
-
+  if (q) data = data.filter(d => d.name.toLowerCase().includes(q));
   renderDashboard(data);
-}
-
-/* ================== PLACEHOLDERS ================== */
-function deleteAsset() {
-  alert("Delete API not enabled yet");
-}
-function editAsset() {
-  alert("Edit API not enabled yet");
-}
-
-/* ================== DOWNLOAD EXCEL ================== */
-function downloadSpecific(role, batch) {
-  const url = `${API_BASE}/export?role=${role}&batch=${batch}`;
-  window.open(url, "_blank");
 }
 
 /* ================== INIT ================== */
