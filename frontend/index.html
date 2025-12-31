@@ -247,6 +247,23 @@
 <div id="page-dashboard" class="page">
 
   <h2 class="page-title">Analytics Dashboard</h2>
+  <div class="dashboard-toolbar">
+    <input id="searchInput" placeholder="Search name / serial" oninput="applyFilters()">
+
+    <select id="filterRole" onchange="applyFilters()">
+        <option value="all">All Roles</option>
+        <option value="student">Student</option>
+        <option value="employee">Employee</option>
+    </select>
+
+    <select id="filterBatch" onchange="applyFilters()">
+        <option value="all">All Batches</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+    </select>
+
+    <button class="btn-excel" onclick="downloadExcel()">⬇ Download Excel</button>
+</div>
 
   <!-- SEARCH BAR -->
   <div class="dashboard-toolbar">
@@ -299,6 +316,8 @@
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>

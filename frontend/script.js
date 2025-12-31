@@ -247,6 +247,63 @@ async function applyFilters() {
   renderDashboard(data);
 }
 
+/* ================== EXCEL DOWNLOAD ================== */
+async function downloadExcel() {
+  try {
+    const res = await fetch(`${API_BASE}/assets`);
+    let data = await res.json();
+
+    // Apply current filters
+    const q = (searchInput.value || "").toLowerCase();
+    const roleVal = filterRole.value;
+    const batchVal = filterBatch.value;
+
+    if (q) {
+      data = data.filter(d =>
+        (d.name || "").toLowerCase().includes(q) ||
+        (d.serial_no || "").toLowerCase().includes(q)
+      );
+    }
+
+    if (roleVal !== "all") data = data.filter(d => d.role === roleVal);
+    if (batchVal !== "all") data = data.filter(d => d.batch === batchVal);
+
+    if (!data.length) {
+      alert("No data to export");
+      return;
+    }
+
+    // Clean Excel data
+    const excelData = data.map(d => ({
+      Name: d.name,
+      Role: d.role,
+      Email: d.email,
+      Platform: d.platform || "",
+      "MAC Address": d.mac_address || "",
+      Asset: d.asset_type,
+      "Serial No": d.serial_no,
+      Brand: d.brand,
+      Model: d.model,
+      RAM: d.ram,
+      Processor: d.processor,
+      Storage: d.storage,
+      Location: d.location,
+      Remarks: d.remarks,
+      "Purchase Date": d.purchase_date
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Assets");
+
+    XLSX.writeFile(workbook, "ITM_Inventory.xlsx");
+
+  } catch (err) {
+    alert("Excel download failed");
+  }
+}
+
+
 /* ================== INIT ================== */
 toggleFields();
 toggleMacField();
