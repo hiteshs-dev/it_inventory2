@@ -106,7 +106,6 @@ function switchPage(page) {
   }
 }
 
-
 /* ================== ROLE TOGGLE ================== */
 function toggleFields() {
   studentFields.style.display = role.value === "student" ? "block" : "none";
