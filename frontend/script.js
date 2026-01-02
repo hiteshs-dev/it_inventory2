@@ -447,7 +447,7 @@ const verificationDate = document.getElementById("verificationDate");
 
 /* ===== Accounting ===== */
 const shopOrigin = document.getElementById("ShopOrigin");
-const purchasePrice = document.getElementById("PurchasePrice");
+const asset_price = document.getElementById("assetPrice").value
 
 /* ===== Location (MUST BE BEFORE SUBMIT) ===== */
 const campusSelect = document.getElementById("campus");
@@ -550,7 +550,7 @@ assetForm.addEventListener("submit", async e => {
     verification_date: verificationDate.value,
 
     shop_origin: shopOrigin.value,
-    purchase_price: purchasePrice.value
+    asset_price: purchasePrice.value
   };
 
   const res = await fetch(
