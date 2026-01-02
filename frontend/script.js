@@ -318,6 +318,31 @@ async function downloadExcel() {
   XLSX.writeFile(workbook, "ITM_Inventory.xlsx");
 }
 
+/* ================== SPECIFIC CSV DOWNLOAD ================== */
+async function downloadSpecific(role, batch) {
+  let url = `${API_BASE}/export?role=${role}`;
+
+  if (batch && batch !== "all") {
+    url += `&batch=${batch}`;
+  }
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    alert("Download failed");
+    return;
+  }
+
+  const blob = await res.blob();
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = `${role}_${batch || "all"}_assets.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+
 /* ================== INIT ================== */
 toggleFields();
 toggleMacField();
