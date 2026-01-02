@@ -1,5 +1,5 @@
 /* ================== GLOBAL ERROR DEBUG ================== */
-window.onerror = function (msg, src, line, col) {
+window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
 };
 
@@ -11,9 +11,6 @@ let currentPage = 1;
 const limit = 50;
 
 /* ================== ELEMENTS ================== */
-const loginModal = document.getElementById("loginModal");
-const navTabs = document.getElementById("navTabs");
-const loginError = document.getElementById("loginError");
 const assetForm = document.getElementById("assetForm");
 
 const role = document.getElementById("role");
@@ -42,69 +39,38 @@ const processor = document.getElementById("processor");
 const hdd = document.getElementById("hdd");
 const remarks = document.getElementById("remarks");
 
+/* ===== Platform / MAC ===== */
 const platform = document.getElementById("platform");
 const macAddress = document.getElementById("macAddress");
 const macField = document.getElementById("macField");
 
-const studentFields = document.getElementById("studentFields");
-const empFields = document.getElementById("empFields");
-
-const statTotal = document.getElementById("statTotal");
-const dashTable = document.getElementById("dashTable");
-const recentList = document.getElementById("recentList");
-
-const searchInput = document.getElementById("searchInput");
-const filterRole = document.getElementById("filterRole");
-const filterBatch = document.getElementById("filterBatch");
-
-/* ===== WARRANTY ===== */
+/* ===== Warranty ===== */
 const warrantyMonths = document.getElementById("warrantyMonths");
 const warrantyPending = document.getElementById("warrantyPending");
 const warrantyInfo = document.getElementById("warrantyInfo");
 
-/* ===== VERIFICATION ===== */
+/* ===== Verification ===== */
 const verifiedBy = document.getElementById("verifiedBy");
 const verificationDate = document.getElementById("verificationDate");
 
-/* ===== ACCOUNTING ===== */
-const purchaseOrigin = document.getElementById("purchaseOrigin");
+/* ===== Accounting ===== */
+const shopOrigin = document.getElementById("shopOrigin");
 const purchasePrice = document.getElementById("purchasePrice");
+
+/* ===== Dashboard ===== */
+const dashTable = document.getElementById("dashTable");
+const pagination = document.getElementById("pagination");
+const searchInput = document.getElementById("searchInput");
+const filterRole = document.getElementById("filterRole");
+const filterBatch = document.getElementById("filterBatch");
 
 let editId = null;
 
-/* ================== LOGIN ================== */
-document.getElementById("loginForm").addEventListener("submit", e => {
-  e.preventDefault();
-  if (username.value === "admin" && password.value === "unix@2026") {
-    loginModal.style.display = "none";
-    navTabs.style.display = "flex";
-    switchPage("entry");
-  } else {
-    loginError.style.display = "block";
-  }
-});
-
-/* ================== PAGE SWITCH ================== */
-function switchPage(page) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-
-  document.getElementById(`page-${page}`).classList.add("active");
-
-  if (page === "dashboard") loadAssets(1);
-}
-
 /* ================== FIELD TOGGLES ================== */
-function toggleFields() {
-  studentFields.style.display = role.value === "student" ? "block" : "none";
-  empFields.style.display = role.value === "employee" ? "block" : "none";
-}
-
 function toggleMacField() {
   macField.style.display = platform.value === "apple" ? "block" : "none";
   if (platform.value !== "apple") macAddress.value = "";
 }
-
 platform.addEventListener("change", toggleMacField);
 
 /* ================== WARRANTY CALC ================== */
@@ -114,23 +80,21 @@ function calculateWarrantyPending() {
   const start = new Date(purchase_date.value);
   const now = new Date();
 
-  const monthsUsed =
+  const used =
     (now.getFullYear() - start.getFullYear()) * 12 +
     (now.getMonth() - start.getMonth());
 
   warrantyPending.value = Math.max(
-    parseInt(warrantyMonths.value) - monthsUsed,
+    parseInt(warrantyMonths.value) - used,
     0
   );
 }
-
 purchase_date.addEventListener("change", calculateWarrantyPending);
 warrantyMonths.addEventListener("input", calculateWarrantyPending);
 
 /* ================== FORM SUBMIT ================== */
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
-  const isEdit = editId !== null;
 
   const payload = {
     role: role.value,
@@ -138,20 +102,21 @@ assetForm.addEventListener("submit", async e => {
     name: name.value,
     email: email.value,
 
-    platform: platform.value,
-    mac_address: platform.value === "apple" ? macAddress.value : "",
-
     batch: role.value === "student" ? batch.value : "",
     roll_no: role.value === "student" ? rollNo.value : "",
     department: role.value === "employee" ? dept.value : "",
     designation: role.value === "employee" ? designation.value : "",
     emp_id: role.value === "employee" ? empId.value : "",
-    location: role.value === "student" ? studentLocation.value : empLocation.value,
+    location:
+      role.value === "student" ? studentLocation.value : empLocation.value,
 
     asset_desc: assetDesc.value,
     asset_type: asset_type.value,
     serial_no: assetId.value,
     purchase_date: purchase_date.value,
+
+    platform: platform.value,
+    mac_address: platform.value === "apple" ? macAddress.value : "",
 
     brand: brand.value,
     model: model.value,
@@ -160,36 +125,44 @@ assetForm.addEventListener("submit", async e => {
     storage: hdd.value,
     remarks: remarks.value,
 
-    warranty_months: warrantyMonths.value || 0,
-    warranty_pending_months: warrantyPending.value || 0,
-    warranty_info: warrantyInfo.value || "",
+    /* WARRANTY */
+    warranty_months: warrantyMonths.value,
+    warranty_pending: warrantyPending.value,
+    warranty_info: warrantyInfo.value,
 
-    verified_by: verifiedBy.value || "",
-    verification_date: verificationDate.value || "",
+    /* VERIFICATION */
+    verified_by: verifiedBy.value,
+    verification_date: verificationDate.value,
 
-    purchase_origin: purchaseOrigin.value || "",
-    purchase_price: purchasePrice.value || 0
+    /* ACCOUNTING */
+    shop_origin: shopOrigin.value,
+    purchase_price: purchasePrice.value
   };
 
-  const res = await fetch(
-    isEdit ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`,
-    {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }
-  );
+  const url = editId
+    ? `${API_BASE}/assets/${editId}`
+    : `${API_BASE}/assets`;
+
+  const method = editId ? "PUT" : "POST";
+
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
   const result = await res.json();
-  if (!result.success) return alert(result.error || "Operation failed");
+  if (!result.success) {
+    alert(result.error || "Operation failed");
+    return;
+  }
 
-  alert(isEdit ? "Asset Updated" : "Asset Added");
+  alert(editId ? "✅ Asset Updated" : "✅ Asset Added");
 
   editId = null;
   assetForm.reset();
-  toggleFields();
   toggleMacField();
-  switchPage("dashboard");
+  loadAssets(1);
 });
 
 /* ================== LOAD ASSETS ================== */
@@ -197,23 +170,17 @@ async function loadAssets(page = 1) {
   currentPage = page;
 
   const res = await fetch(
-    `${API_BASE}/assets?page=${page}&limit=${limit}`
+    `${API_BASE}/assets?page=${page}&limit=${limit}&search=${searchInput.value}&role=${filterRole.value}&batch=${filterBatch.value}`
   );
 
   const result = await res.json();
   renderTable(result.data);
   renderPagination(result.total);
-  statTotal.innerText = result.total;
 }
 
 /* ================== TABLE ================== */
 function renderTable(data) {
   dashTable.innerHTML = "";
-  recentList.innerHTML = "";
-
-  data.slice(0, 5).forEach(d => {
-    recentList.innerHTML += `<div>• ${d.name} (${d.asset_type})</div>`;
-  });
 
   data.forEach(d => {
     dashTable.innerHTML += `
@@ -235,33 +202,25 @@ function renderTable(data) {
 
 /* ================== PAGINATION ================== */
 function renderPagination(total) {
+  pagination.innerHTML = "";
   const totalPages = Math.ceil(total / limit);
-  const container = document.getElementById("pagination");
-  container.innerHTML = "";
 
   for (let i = 1; i <= totalPages; i++) {
-    container.innerHTML += `
-      <button class="${i === currentPage ? "active" : ""}"
-        onclick="loadAssets(${i})">${i}</button>
-    `;
+    if (i <= 100) {
+      pagination.innerHTML += `
+        <button class="${i === currentPage ? "active" : ""}"
+                onclick="loadAssets(${i})">${i}</button>
+      `;
+    }
   }
 }
 
-/* ================== EDIT / DELETE ================== */
-async function deleteAsset(id) {
-  if (!confirm("Delete this asset?")) return;
-  await fetch(`${API_BASE}/assets/${id}`, { method: "DELETE" });
-  loadAssets(currentPage);
-}
-
+/* ================== EDIT ================== */
 async function editAsset(id) {
-  const res = await fetch(`${API_BASE}/assets?page=1&limit=100000`);
-  const result = await res.json();
-  const asset = result.data.find(a => a.id === id);
-  if (!asset) return;
+  const res = await fetch(`${API_BASE}/assets/${id}`);
+  const asset = await res.json();
 
   editId = id;
-  switchPage("entry");
 
   Object.keys(asset).forEach(k => {
     if (document.getElementById(k)) {
@@ -269,10 +228,21 @@ async function editAsset(id) {
     }
   });
 
-  toggleFields();
   toggleMacField();
 }
 
+/* ================== DELETE ================== */
+async function deleteAsset(id) {
+  if (!confirm("Delete this asset?")) return;
+  await fetch(`${API_BASE}/assets/${id}`, { method: "DELETE" });
+  loadAssets(currentPage);
+}
+
+/* ================== FILTER ================== */
+function applyFilters() {
+  loadAssets(1);
+}
+
 /* ================== INIT ================== */
-toggleFields();
 toggleMacField();
+loadAssets(1);
