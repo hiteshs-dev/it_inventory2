@@ -447,7 +447,7 @@ const verificationDate = document.getElementById("verificationDate");
 
 /* ===== Accounting ===== */
 const shopOrigin = document.getElementById("ShopOrigin");
-const asset_price = document.getElementById("assetPrice").value
+const assetPrice = document.getElementById("assetPrice");
 
 /* ===== Location (MUST BE BEFORE SUBMIT) ===== */
 const campusSelect = document.getElementById("campus");
@@ -461,6 +461,21 @@ const pageInfo = document.getElementById("pageInfo");
 const searchInput = document.getElementById("searchInput") || { value: "" };
 const filterRole = document.getElementById("filterRole") || { value: "all" };
 const filterBatch = document.getElementById("filterBatch") || { value: "all" };
+
+/* ===== Recent ===== */
+function renderRecent(data) {
+  const recentList = document.getElementById("recentList");
+  if (!recentList) return;
+
+  recentList.innerHTML = "";
+  data.slice(0, 5).forEach(d => {
+    recentList.innerHTML += `
+      <div class="recent-item">
+        ${d.name} — ${d.asset_type} (${d.serial_no})
+      </div>
+    `;
+  });
+}
 
 /* ================== LOGIN ================== */
 loginForm.addEventListener("submit", e => {
@@ -550,7 +565,9 @@ assetForm.addEventListener("submit", async e => {
     verification_date: verificationDate.value,
 
     shop_origin: shopOrigin.value,
-    asset_price: purchasePrice.value
+    asset_price: assetPrice && assetPrice.value
+  ? parseInt(assetPrice.value)
+  : null,
   };
 
   const res = await fetch(
@@ -585,6 +602,7 @@ async function loadAssets(page = 1) {
   if (!result.data) return;
 
   renderTable(result.data);
+  renderRecent(result.data);
   renderPagination(result.total);
   if (pageInfo) renderPageInfo(result.total);
 }
