@@ -269,6 +269,16 @@ async function deleteAsset(id) {
   loadAssets(currentPage);
 }
 
+function switchPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+  document.getElementById(`page-${page}`).classList.add("active");
+
+  if (page === "dashboard") loadAssets(1);
+}
+
+
 /* ================== FILTER ================== */
 function applyFilters() {
   loadAssets(1);
