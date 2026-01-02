@@ -10,6 +10,14 @@ const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 let currentPage = 1;
 const limit = 50;
 
+/* ================== LOGIN ================== */
+const loginModal = document.getElementById("loginModal");
+const loginForm = document.getElementById("loginForm");
+const loginError = document.getElementById("loginError");
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+const navTabs = document.getElementById("navTabs");
+
 /* ================== ELEMENTS ================== */
 const assetForm = document.getElementById("assetForm");
 
@@ -26,6 +34,9 @@ const dept = document.getElementById("dept");
 const designation = document.getElementById("designation");
 const empId = document.getElementById("empId");
 const empLocation = document.getElementById("empLocation");
+
+const studentFields = document.getElementById("studentFields");
+const empFields = document.getElementById("empFields");
 
 const assetDesc = document.getElementById("assetDesc");
 const asset_type = document.getElementById("asset_type");
@@ -63,17 +74,37 @@ const pagination = document.getElementById("pagination");
 const searchInput = document.getElementById("searchInput");
 const filterRole = document.getElementById("filterRole");
 const filterBatch = document.getElementById("filterBatch");
+const pageInfo = document.getElementById("pageInfo");
 
 let editId = null;
 
+/* ================== LOGIN HANDLER ================== */
+loginForm.addEventListener("submit", e => {
+  e.preventDefault();
+
+  if (username.value === "admin" && password.value === "unix@2026") {
+    loginModal.style.display = "none";
+    navTabs.style.display = "flex";
+    loadAssets(1);
+  } else {
+    loginError.style.display = "block";
+  }
+});
+
 /* ================== FIELD TOGGLES ================== */
+function toggleFields() {
+  studentFields.style.display = role.value === "student" ? "block" : "none";
+  empFields.style.display = role.value === "employee" ? "block" : "none";
+}
+role.addEventListener("change", toggleFields);
+
 function toggleMacField() {
   macField.style.display = platform.value === "apple" ? "block" : "none";
   if (platform.value !== "apple") macAddress.value = "";
 }
 platform.addEventListener("change", toggleMacField);
 
-/* ================== WARRANTY CALC ================== */
+/* ================== WARRANTY ================== */
 function calculateWarrantyPending() {
   if (!purchase_date.value || !warrantyMonths.value) return;
 
@@ -107,8 +138,7 @@ assetForm.addEventListener("submit", async e => {
     department: role.value === "employee" ? dept.value : "",
     designation: role.value === "employee" ? designation.value : "",
     emp_id: role.value === "employee" ? empId.value : "",
-    location:
-      role.value === "student" ? studentLocation.value : empLocation.value,
+    location: role.value === "student" ? studentLocation.value : empLocation.value,
 
     asset_desc: assetDesc.value,
     asset_type: asset_type.value,
@@ -125,42 +155,33 @@ assetForm.addEventListener("submit", async e => {
     storage: hdd.value,
     remarks: remarks.value,
 
-    /* WARRANTY */
     warranty_months: warrantyMonths.value,
     warranty_pending: warrantyPending.value,
     warranty_info: warrantyInfo.value,
 
-    /* VERIFICATION */
     verified_by: verifiedBy.value,
     verification_date: verificationDate.value,
 
-    /* ACCOUNTING */
     shop_origin: shopOrigin.value,
     purchase_price: purchasePrice.value
   };
 
-  const url = editId
-    ? `${API_BASE}/assets/${editId}`
-    : `${API_BASE}/assets`;
-
-  const method = editId ? "PUT" : "POST";
-
-  const res = await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  const res = await fetch(
+    editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`,
+    {
+      method: editId ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }
+  );
 
   const result = await res.json();
-  if (!result.success) {
-    alert(result.error || "Operation failed");
-    return;
-  }
+  if (!result.success) return alert(result.error || "Failed");
 
-  alert(editId ? "✅ Asset Updated" : "✅ Asset Added");
-
+  alert(editId ? "Updated" : "Added");
   editId = null;
   assetForm.reset();
+  toggleFields();
   toggleMacField();
   loadAssets(1);
 });
@@ -174,14 +195,16 @@ async function loadAssets(page = 1) {
   );
 
   const result = await res.json();
+  if (!result.data) return;
+
   renderTable(result.data);
   renderPagination(result.total);
+  renderPageInfo(result.total);
 }
 
 /* ================== TABLE ================== */
 function renderTable(data) {
   dashTable.innerHTML = "";
-
   data.forEach(d => {
     dashTable.innerHTML += `
       <tr>
@@ -203,37 +226,45 @@ function renderTable(data) {
 /* ================== PAGINATION ================== */
 function renderPagination(total) {
   pagination.innerHTML = "";
-  const totalPages = Math.ceil(total / limit);
+  const pages = Math.ceil(total / limit);
 
-  for (let i = 1; i <= totalPages; i++) {
-    if (i <= 100) {
-      pagination.innerHTML += `
-        <button class="${i === currentPage ? "active" : ""}"
-                onclick="loadAssets(${i})">${i}</button>
-      `;
-    }
+  if (currentPage > 1)
+    pagination.innerHTML += `<button onclick="loadAssets(${currentPage - 1})">‹</button>`;
+
+  for (let i = Math.max(1, currentPage - 3); i <= Math.min(pages, currentPage + 3); i++) {
+    pagination.innerHTML += `
+      <button class="${i === currentPage ? "active" : ""}"
+              onclick="loadAssets(${i})">${i}</button>`;
   }
+
+  if (currentPage < pages)
+    pagination.innerHTML += `<button onclick="loadAssets(${currentPage + 1})">›</button>`;
 }
 
-/* ================== EDIT ================== */
+function renderPageInfo(total) {
+  const start = (currentPage - 1) * limit + 1;
+  const end = Math.min(currentPage * limit, total);
+  pageInfo.innerText = `Showing ${start}–${end} of ${total}`;
+}
+
+/* ================== EDIT / DELETE ================== */
 async function editAsset(id) {
-  const res = await fetch(`${API_BASE}/assets/${id}`);
-  const asset = await res.json();
+  const res = await fetch(`${API_BASE}/assets?page=1&limit=10000`);
+  const result = await res.json();
+  const asset = result.data.find(a => a.id === id);
+  if (!asset) return;
 
   editId = id;
-
   Object.keys(asset).forEach(k => {
-    if (document.getElementById(k)) {
-      document.getElementById(k).value = asset[k] || "";
-    }
+    if (document.getElementById(k)) document.getElementById(k).value = asset[k] || "";
   });
 
+  toggleFields();
   toggleMacField();
 }
 
-/* ================== DELETE ================== */
 async function deleteAsset(id) {
-  if (!confirm("Delete this asset?")) return;
+  if (!confirm("Delete asset?")) return;
   await fetch(`${API_BASE}/assets/${id}`, { method: "DELETE" });
   loadAssets(currentPage);
 }
@@ -244,5 +275,5 @@ function applyFilters() {
 }
 
 /* ================== INIT ================== */
+toggleFields();
 toggleMacField();
-loadAssets(1);
