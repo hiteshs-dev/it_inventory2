@@ -93,6 +93,16 @@
           </div>
         </div>
 
+        <!-- ENTITY -->
+        <div class="form-group">
+          <label>Entity</label>
+          <select id="entity">
+            <option value="">Select Entity</option>
+            <option value="ITM Trust">ITM Trust</option>
+            <option value="EduTech">EduTech</option>
+          </select>
+        </div>
+
         <!-- STUDENT -->
         <div id="studentFields">
           <div class="form-row">
@@ -110,11 +120,6 @@
               <input id="rollNo" />
             </div>
           </div>
-
-          <div class="form-group">
-            <label>Location</label>
-            <input id="studentLocation" placeholder="Hostel / Home" />
-          </div>
         </div>
 
         <!-- EMPLOYEE -->
@@ -131,16 +136,38 @@
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Employee ID</label>
-              <input id="empId" />
-            </div>
+          <div class="form-group">
+            <label>Employee ID</label>
+            <input id="empId" />
+          </div>
+        </div>
 
-            <div class="form-group">
-              <label>Office Location</label>
-              <input id="empLocation" />
-            </div>
+        <!-- ================= LOCATION ================= -->
+        <h3 class="section-title">Location</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Campus</label>
+            <select id="campus">
+              <option value="">Select Campus</option>
+              <option>KHR.Campus</option>
+              <option>CORP.Office</option>
+              <option>RPR.Campus</option>
+              <option>VAD.Campus</option>
+              <option>VIZ.Campus</option>
+              <option>SRS.Campus</option>
+              <option>WAR.Campus</option>
+              <option>Scrap.ITMGroup</option>
+              <option>PanIndia.ISA.Offices</option>
+              <option>Virtual.Hosting</option>
+              <option>IDC.Hosting</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Area / Room</label>
+            <select id="areaRoom">
+              <option value="">Select Area / Room</option>
+            </select>
           </div>
         </div>
 
@@ -160,48 +187,9 @@
               <option>Mac Desktop</option>
               <option>MacBook Pro Laptop</option>
               <option>Monitor</option>
-              <option>Netbook</option>
-              <option>PBX</option>
-              <option>Portable HDD</option>
-              <option>Portable HDD Case</option>
-              <option>Presentation Monitor</option>
-              <option>Presenter</option>
               <option>Printer</option>
               <option>Projector</option>
               <option>Rack Server</option>
-              <option>Rechargeable Batteries</option>
-              <option>Router</option>
-              <option>SFP Module</option>
-              <option>Scanner</option>
-              <option>Still Camera</option>
-              <option>USB Pendrive</option>
-              <option>UPS Unit</option>
-              <option>Video Conf Cam</option>
-              <option>Video Conf Unit</option>
-              <option>Virtual Server</option>
-              <option>WebCam</option>
-              <option>WiFi Access Point</option>
-              <option>WiFi Network Controller</option>
-              <option>Wireless Display Adapter</option>
-              <option>iPad</option>
-              <option>Lab Desktop</option>
-              <option>Amplifier Speaker</option>
-              <option>Audio Amplifier</option>
-              <option>Audio Mixer</option>
-              <option>Audio Speaker Set</option>
-              <option>Barcode Scanner</option>
-              <option>Blower</option>
-              <option>ChromeBook</option>
-              <option>Conference Mic</option>
-              <option>Cordless Mic</option>
-              <option>Crimping Tool</option>
-              <option>Desktop Server</option>
-              <option>Employee Desktop</option>
-              <option>Ethernet Adapter</option>
-              <option>FAX</option>
-              <option>Firewall</option>
-              <option>Hand Mic</option>
-              <option>Hands-free Earphones</option>
             </select>
           </div>
         </div>
@@ -213,98 +201,34 @@
           </div>
 
           <div class="form-group">
-            <label>Purchase Date</label>
+            <label>Asset Issuing Date</label>
             <input type="date" id="purchase_date" />
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Brand</label>
-            <input id="brand" />
-          </div>
-
-          <div class="form-group">
-            <label>Model</label>
-            <input id="model" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>RAM</label>
-            <input id="ram" />
-          </div>
-
-          <div class="form-group">
-            <label>Processor</label>
-            <input id="processor" />
-          </div>
-        </div>
-
-        <!-- PLATFORM -->
-        <div class="form-group">
-          <label>Platform</label>
-          <select id="platform" onchange="toggleMacField()">
-            <option value="">Select</option>
-            <option value="windows">Windows</option>
-            <option value="apple">Apple</option>
-          </select>
-        </div>
-
-        <div class="form-group" id="macField" style="display:none;">
-          <label>MAC Address</label>
-          <input id="macAddress" placeholder="AA:BB:CC:DD:EE:FF" />
-        </div>
-
-        <div class="form-group">
-          <label>Storage</label>
-          <input id="hdd" />
-        </div>
-
+        <!-- WARRANTY -->
         <h3 class="section-title">Warranty Details</h3>
-
-<div class="grid-2">
-  <div class="form-group">
-    <label>Date of Purchase</label>
-    <input type="date" id="purchase_date">
-  </div>
-
-  <div class="form-group">
-    <label>Warranty (Months)</label>
-    <input type="number" id="warrantyMonths" placeholder="e.g. 36">
-  </div>
-
-  <div class="form-group">
-    <label>Warranty Pending (Months)</label>
-    <input type="number" id="warrantyPending" readonly>
-  </div>
-
-  <div class="form-group">
-    <label>Warranty Info</label>
-    <input type="text" id="warrantyInfo" placeholder="Onsite / Extended / AMC">
-  </div>
-</div>
-
-<h3 class="section-title">Manual Verification</h3>
-
-<div class="grid-2">
-  <div class="form-group">
-    <label>Verified By (Email)</label>
-    <input type="email" id="verifiedBy" placeholder="staff@itm.edu">
-  </div>
-
-  <div class="form-group">
-    <label>Verification Date</label>
-    <input type="date" id="verificationDate">
-  </div>
-</div>
-
-
-        <div class="form-group">
-          <label>Remarks</label>
-          <textarea id="remarks"></textarea>
+        <div class="grid-2">
+          <input type="number" id="warrantyMonths" placeholder="Warranty Months">
+          <input type="number" id="warrantyPending" placeholder="Pending Months" readonly>
+          <input type="text" id="warrantyInfo" placeholder="Warranty Info">
         </div>
+
+        <!-- ACCOUNTING -->
+        <h3 class="section-title">Accounting</h3>
+        <div class="form-row">
+          <input type="text" id="shopOrigin" placeholder="Shop / Origin">
+          <input type="number" id="purchasePrice" placeholder="Purchase Price (₹)">
+        </div>
+
+        <!-- VERIFICATION -->
+        <h3 class="section-title">Manual Verification</h3>
+        <div class="grid-2">
+          <input type="email" id="verifiedBy" placeholder="Verified By Email">
+          <input type="date" id="verificationDate">
+        </div>
+
+        <textarea id="remarks" placeholder="Remarks"></textarea>
 
         <button class="btn-submit" type="submit">Submit Entry</button>
       </form>
