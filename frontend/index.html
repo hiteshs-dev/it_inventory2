@@ -157,8 +157,51 @@
             <label>Asset Type</label>
             <select id="asset_type">
               <option>Laptop</option>
-              <option>Desktop</option>
-              <option>Tablet</option>
+              <option>Mac Desktop</option>
+              <option>MacBook Pro Laptop</option>
+              <option>Monitor</option>
+              <option>Netbook</option>
+              <option>PBX</option>
+              <option>Portable HDD</option>
+              <option>Portable HDD Case</option>
+              <option>Presentation Monitor</option>
+              <option>Presenter</option>
+              <option>Printer</option>
+              <option>Projector</option>
+              <option>Rack Server</option>
+              <option>Rechargeable Batteries</option>
+              <option>Router</option>
+              <option>SFP Module</option>
+              <option>Scanner</option>
+              <option>Still Camera</option>
+              <option>USB Pendrive</option>
+              <option>UPS Unit</option>
+              <option>Video Conf Cam</option>
+              <option>Video Conf Unit</option>
+              <option>Virtual Server</option>
+              <option>WebCam</option>
+              <option>WiFi Access Point</option>
+              <option>WiFi Network Controller</option>
+              <option>Wireless Display Adapter</option>
+              <option>iPad</option>
+              <option>Lab Desktop</option>
+              <option>Amplifier Speaker</option>
+              <option>Audio Amplifier</option>
+              <option>Audio Mixer</option>
+              <option>Audio Speaker Set</option>
+              <option>Barcode Scanner</option>
+              <option>Blower</option>
+              <option>ChromeBook</option>
+              <option>Conference Mic</option>
+              <option>Cordless Mic</option>
+              <option>Crimping Tool</option>
+              <option>Desktop Server</option>
+              <option>Employee Desktop</option>
+              <option>Ethernet Adapter</option>
+              <option>FAX</option>
+              <option>Firewall</option>
+              <option>Hand Mic</option>
+              <option>Hands-free Earphones</option>
             </select>
           </div>
         </div>
@@ -218,6 +261,45 @@
           <label>Storage</label>
           <input id="hdd" />
         </div>
+
+        <h3 class="section-title">Warranty Details</h3>
+
+<div class="grid-2">
+  <div class="form-group">
+    <label>Date of Purchase</label>
+    <input type="date" id="purchase_date">
+  </div>
+
+  <div class="form-group">
+    <label>Warranty (Months)</label>
+    <input type="number" id="warrantyMonths" placeholder="e.g. 36">
+  </div>
+
+  <div class="form-group">
+    <label>Warranty Pending (Months)</label>
+    <input type="number" id="warrantyPending" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Warranty Info</label>
+    <input type="text" id="warrantyInfo" placeholder="Onsite / Extended / AMC">
+  </div>
+</div>
+
+<h3 class="section-title">Manual Verification</h3>
+
+<div class="grid-2">
+  <div class="form-group">
+    <label>Verified By (Email)</label>
+    <input type="email" id="verifiedBy" placeholder="staff@itm.edu">
+  </div>
+
+  <div class="form-group">
+    <label>Verification Date</label>
+    <input type="date" id="verificationDate">
+  </div>
+</div>
+
 
         <div class="form-group">
           <label>Remarks</label>

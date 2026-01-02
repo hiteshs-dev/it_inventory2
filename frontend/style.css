@@ -364,6 +364,14 @@ textarea:focus {
   background: #dbeafe;
 }
 
+.section-title {
+  margin-top: 30px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
 
 /* =====================
    UTILITIES
