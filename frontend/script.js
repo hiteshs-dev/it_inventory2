@@ -3,6 +3,9 @@ window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
 };
 
+document.addEventListener("DOMContentLoaded", () => {
+});
+
 /* ================== API ================== */
 const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
@@ -489,19 +492,21 @@ function renderRecent(data) {
   });
 }
 
-/* ================== LOGIN ================== */
-loginForm.addEventListener("submit", e => {
-  e.preventDefault();
+/* login logic */
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-  if (username.value === "admin" && password.value === "unix@2026") {
-    loginModal.style.display = "none";
-    navTabs.style.display = "flex";
-    loadAssets(1);
-  } else {
-    loginError.style.display = "block";
+      if (username.value === "admin" && password.value === "unix@2026") {
+        loginModal.style.display = "none";
+        navTabs.style.display = "flex";
+        loadAssets(1);
+      } else {
+        loginError.style.display = "block";
+      }
+    });
   }
-});
-
+  
 /* ================== FIELD TOGGLES ================== */
 function toggleFields() {
   studentFields.style.display = role.value === "student" ? "block" : "none";
@@ -552,6 +557,23 @@ warrantyMonths.addEventListener("input", calculateWarrantyPending);
 /* ===== Location (MUST BE BEFORE SUBMIT) ===== */
 const campusSelect = document.getElementById("campus");
 const areaRoomSelect = document.getElementById("areaRoom");
+
+if (campusSelect && areaRoomSelect) {
+  campusSelect.addEventListener("change", () => {
+    areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
+
+    const areas = campusAreas[campusSelect.value];
+    if (!areas) return;
+
+    areas.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = a;
+      opt.textContent = a;
+      areaRoomSelect.appendChild(opt);
+    });
+  });
+}
+
 
 /* ================== FORM SUBMIT ================== */
 assetForm.addEventListener("submit", async e => {
