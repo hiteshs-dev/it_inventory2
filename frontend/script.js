@@ -387,6 +387,22 @@ const campusAreas = {
   ]
 };
 
+/* ================== download ================== */
+async function downloadBatch(batch) {
+  const res = await fetch(`/api/assets?batch=${batch}&limit=10000`);
+  const result = await res.json();
+
+  if (!result.data || !result.data.length) {
+    alert("No data found for batch " + batch);
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(result.data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, `Batch_${batch}`);
+
+  XLSX.writeFile(wb, `Batch_${batch}.xlsx`);
+}
 
 /* ================== PAGINATION ================== */
 let currentPage = 1;
@@ -498,6 +514,21 @@ function toggleMacField() {
   if (platform.value !== "apple") macAddress.value = "";
 }
 platform.addEventListener("change", toggleMacField);
+
+/* ================== download ================== */
+const download2026Btn = document.getElementById("download2026");
+if (download2026Btn) {
+  download2026Btn.addEventListener("click", () => {
+    downloadBatch("2026");
+  });
+}
+
+const download2027Btn = document.getElementById("download2027");
+if (download2026Btn) {
+  download2026Btn.addEventListener("click", () => {
+    downloadBatch("2027");
+  });
+}
 
 /* ================== WARRANTY ================== */
 function calculateWarrantyPending() {
@@ -717,6 +748,28 @@ campusSelect.addEventListener("change", () => {
   });
 });
 
+/* ================== charts ================== */
+function renderDashboardChart(data) {
+  const ctx = document.getElementById("assetChart");
+  if (!ctx) return;
+
+  const counts = {};
+  data.forEach(a => {
+    counts[a.asset_type] = (counts[a.asset_type] || 0) + 1;
+  });
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        label: "Assets",
+        data: Object.values(counts)
+      }]
+    }
+  });
+}
+
 /* ================== SWITCH PAGE ================== */
 
 function switchPage(page) {
@@ -733,6 +786,7 @@ function switchPage(page) {
 function applyFilters() {
   loadAssets(1);
 }
+renderDashboardChart(result.data);
 
 /* ================== INIT ================== */
 toggleFields();

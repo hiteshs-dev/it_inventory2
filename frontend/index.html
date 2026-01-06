@@ -173,56 +173,109 @@
 
         <hr />
 
-        <!-- ASSET -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Asset Description</label>
-            <input id="assetDesc" required />
-          </div>
+        <!-- ================= ASSET DETAILS ================= -->
+<div class="card">
 
-          <div class="form-group">
-            <label>Asset Type</label>
-            <select id="asset_type">
-              <option>Laptop</option>
-              <option>Mac Desktop</option>
-              <option>MacBook Pro Laptop</option>
-              <option>Monitor</option>
-              <option>Printer</option>
-              <option>Projector</option>
-              <option>Rack Server</option>
-            </select>
-          </div>
-        </div>
+  <h3 class="section-title">Asset Details</h3>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Serial Number</label>
-            <input id="assetId" required />
-          </div>
+  <!-- Asset Description & Type -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Asset Description</label>
+      <input id="assetDesc" required placeholder="Office Laptop / Faculty Desktop etc." />
+    </div>
 
-          <div class="form-group">
-            <label>Asset Issuing Date</label>
-            <input type="date" id="purchase_date" />
-          </div>
-        </div>
+    <div class="form-group">
+      <label>Asset Type</label>
+      <select id="asset_type">
+        <option value="">Select Asset Type</option>
+        <option>Laptop</option>
+        <option>Mac Desktop</option>
+        <option>MacBook Pro Laptop</option>
+        <option>Monitor</option>
+        <option>Printer</option>
+        <option>Projector</option>
+        <option>Rack Server</option>
+      </select>
+    </div>
+  </div>
 
-        <label>Brand</label>
-            <input id="brand" type="text" />
+  <!-- Serial / Issue Date -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Serial Number</label>
+      <input id="assetId" required />
+    </div>
 
-        <label>Model</label>
-            <input id="model" type="text" />
+    <div class="form-group">
+      <label>Asset Issuing Date</label>
+      <input type="date" id="purchase_date" />
+    </div>
+  </div>
 
-        <label>RAM</label>
-            <input id="ram" type="text" />
+  <!-- Asset Status -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Asset Status</label>
+      <select id="assetStatus">
+        <option value="">Select Status</option>
+        <option>In Use</option>
+        <option>Stored</option>
+        <option>Under Maintenance</option>
+        <option>Issued Temporarily</option>
+        <option>Scrapped</option>
+        <option>Transferred</option>
+      </select>
+    </div>
+  </div>
 
-        <label>Processor</label>
-            <input id="processor" type="text" />
+  <!-- Technical Specifications -->
+  <h4 class="sub-title">Technical Specifications</h4>
 
-        <label>Storage</label>
-            <input id="hdd" type="text" />
+  <div class="form-row">
+    <div class="form-group">
+      <label>Brand</label>
+      <input id="brand" type="text" placeholder="Dell / HP / Apple" />
+    </div>
 
-        <label>Maintenance Instructions</labe>
-            <textarea id="remarks"></textarea>
+    <div class="form-group">
+      <label>Model</label>
+      <input id="model" type="text" placeholder="Latitude / ThinkPad" />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>RAM</label>
+      <input id="ram" type="text" placeholder="8 GB / 16 GB" />
+    </div>
+
+    <div class="form-group">
+      <label>Processor</label>
+      <input id="processor" type="text" placeholder="i5 / i7 / M1" />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Storage</label>
+      <input id="hdd" type="text" placeholder="256 GB SSD / 1 TB HDD" />
+    </div>
+  </div>
+
+  <!-- Maintenance -->
+  <div class="form-row">
+    <div class="form-group full-width">
+      <label>Maintenance Instructions</label>
+      <textarea
+        id="remarks"
+        rows="3"
+        placeholder="Cleaning schedule, service notes, battery care, restrictions etc."
+      ></textarea>
+    </div>
+  </div>
+
+</div>
 
         <!-- WARRANTY -->
         <h3 class="section-title">Warranty Details</h3>
