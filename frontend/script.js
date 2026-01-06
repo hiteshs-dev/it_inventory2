@@ -4,6 +4,7 @@ window.onerror = function (msg, src, line) {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  initApp();
 });
 
 /* ================== API ================== */
@@ -492,7 +493,9 @@ function renderRecent(data) {
   });
 }
 
-/* login logic */
+function initApp() {
+
+  /* ===== LOGIN ===== */
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -506,142 +509,150 @@ function renderRecent(data) {
       }
     });
   }
-  
-/* ================== FIELD TOGGLES ================== */
-function toggleFields() {
-  studentFields.style.display = role.value === "student" ? "block" : "none";
-  empFields.style.display = role.value === "employee" ? "block" : "none";
-}
-role.addEventListener("change", toggleFields);
 
-function toggleMacField() {
-  macField.style.display = platform.value === "apple" ? "block" : "none";
-  if (platform.value !== "apple") macAddress.value = "";
-}
-platform.addEventListener("change", toggleMacField);
+  /* ================== FIELD TOGGLES ================== */
+  function toggleFields() {
+    if (!role) return;
+    studentFields.style.display = role.value === "student" ? "block" : "none";
+    empFields.style.display = role.value === "employee" ? "block" : "none";
+  }
 
-/* ================== download ================== */
-const download2026Btn = document.getElementById("download2026");
-if (download2026Btn) {
-  download2026Btn.addEventListener("click", () => {
-    downloadBatch("2026");
-  });
-}
+  if (role) role.addEventListener("change", toggleFields);
 
-const download2027Btn = document.getElementById("download2027");
-if (download2026Btn) {
-  download2026Btn.addEventListener("click", () => {
-    downloadBatch("2027");
-  });
-}
+  function toggleMacField() {
+    if (!platform) return;
+    macField.style.display = platform.value === "apple" ? "block" : "none";
+    if (platform.value !== "apple" && macAddress) macAddress.value = "";
+  }
 
-/* ================== WARRANTY ================== */
-function calculateWarrantyPending() {
-  if (!purchaseDate.value || !warrantyMonths.value) return;
+  if (platform) platform.addEventListener("change", toggleMacField);
 
-  const start = new Date(purchaseDate.value);
-  const now = new Date();
-
-  const used =
-    (now.getFullYear() - start.getFullYear()) * 12 +
-    (now.getMonth() - start.getMonth());
-
-  warrantyPending.value = Math.max(
-    Number(warrantyMonths.value) - used,
-    0
-  );
-}
-purchaseDate.addEventListener("change", calculateWarrantyPending);
-warrantyMonths.addEventListener("input", calculateWarrantyPending);
-
-/* ===== Location (MUST BE BEFORE SUBMIT) ===== */
-const campusSelect = document.getElementById("campus");
-const areaRoomSelect = document.getElementById("areaRoom");
-
-if (campusSelect && areaRoomSelect) {
-  campusSelect.addEventListener("change", () => {
-    areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
-
-    const areas = campusAreas[campusSelect.value];
-    if (!areas) return;
-
-    areas.forEach(a => {
-      const opt = document.createElement("option");
-      opt.value = a;
-      opt.textContent = a;
-      areaRoomSelect.appendChild(opt);
+  /* ================== DOWNLOAD ================== */
+  const download2026Btn = document.getElementById("download2026");
+  if (download2026Btn) {
+    download2026Btn.addEventListener("click", () => {
+      downloadBatch("2026");
     });
-  });
-}
+  }
 
+  const download2027Btn = document.getElementById("download2027");
+  if (download2027Btn) {
+    download2027Btn.addEventListener("click", () => {
+      downloadBatch("2027");
+    });
+  }
 
-/* ================== FORM SUBMIT ================== */
-assetForm.addEventListener("submit", async e => {
-  e.preventDefault();
+  /* ================== WARRANTY ================== */
+  function calculateWarrantyPending() {
+    if (!purchaseDate?.value || !warrantyMonths?.value) return;
 
-  const payload = {
-    role: role.value,
-    title: title.value,
-    name: nameField.value,
-    email: email.value,
+    const start = new Date(purchaseDate.value);
+    const now = new Date();
 
-    batch: role.value === "student" ? batch.value : "",
-    roll_no: role.value === "student" ? rollNo.value : "",
-    department: role.value === "employee" ? dept.value : "",
-    designation: role.value === "employee" ? designation.value : "",
-    emp_id: role.value === "employee" ? empId.value : "",
+    const used =
+      (now.getFullYear() - start.getFullYear()) * 12 +
+      (now.getMonth() - start.getMonth());
 
-    entity: document.getElementById("entity").value,
-    campus: campusSelect.value,
-    area_room: areaRoomSelect.value,
+    warrantyPending.value = Math.max(
+      Number(warrantyMonths.value) - used,
+      0
+    );
+  }
 
-    asset_desc: assetDesc.value,
-    asset_type: assetType.value,
-    serial_no: assetId.value,
-    purchase_date: purchaseDate.value,
+  if (purchaseDate) purchaseDate.addEventListener("change", calculateWarrantyPending);
+  if (warrantyMonths) warrantyMonths.addEventListener("input", calculateWarrantyPending);
 
-    platform: platform.value,
-    mac_address: platform.value === "apple" ? macAddress.value : "",
+  /* ===== CAMPUS → AREA ===== */
+  if (campusSelect && areaRoomSelect) {
+    campusSelect.addEventListener("change", () => {
+      areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
+      const areas = campusAreas[campusSelect.value];
+      if (!areas) return;
 
-    brand: brand.value,
-    model: model.value,
-    ram: ram.value,
-    processor: processor.value,
-    storage: hdd.value,
-    remarks: remarks.value,
+      areas.forEach(room => {
+        const opt = document.createElement("option");
+        opt.value = room;
+        opt.textContent = room;
+        areaRoomSelect.appendChild(opt);
+      });
+    });
+  }
 
-    warranty_months: warrantyMonths.value,
-    warranty_pending: warrantyPending.value,
-    warranty_info: warrantyInfo.value,
+  /* ================== FORM SUBMIT ================== */
+  if (assetForm) {
+    assetForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    verified_by: verifiedBy.value,
-    verification_date: verificationDate.value,
+      const payload = {
+        role: role.value,
+        title: title.value,
+        name: nameField.value,
+        email: email.value,
 
-    shop_origin: shopOrigin.value,
-    asset_price: assetPrice && assetPrice.value
-  ? parseInt(assetPrice.value)
-  : null,
-  };
+        batch: role.value === "student" ? batch.value : "",
+        roll_no: role.value === "student" ? rollNo.value : "",
+        department: role.value === "employee" ? dept.value : "",
+        designation: role.value === "employee" ? designation.value : "",
+        emp_id: role.value === "employee" ? empId.value : "",
 
-  const res = await fetch(
-    editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`,
-    {
-      method: editId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }
-  );
+        entity: document.getElementById("entity")?.value || "",
+        campus: campusSelect?.value || "",
+        area_room: areaRoomSelect?.value || "",
 
-  const result = await res.json();
-  if (!result.success) return alert(result.error || "Failed");
+        asset_desc: assetDesc.value,
+        asset_type: assetType.value,
+        serial_no: assetId.value,
+        purchase_date: purchaseDate.value,
 
-  alert(editId ? "Updated Successfully" : "Added Successfully");
-  editId = null;
-  assetForm.reset();
+        platform: platform.value,
+        mac_address: platform.value === "apple" ? macAddress.value : "",
+
+        brand: brand.value,
+        model: model.value,
+        ram: ram.value,
+        processor: processor.value,
+        storage: hdd.value,
+        remarks: remarks.value,
+
+        warranty_months: warrantyMonths.value,
+        warranty_pending: warrantyPending.value,
+        warranty_info: warrantyInfo.value,
+
+        verified_by: verifiedBy.value,
+        verification_date: verificationDate.value,
+
+        shop_origin: shopOrigin.value,
+        asset_price: assetPrice?.value ? parseInt(assetPrice.value) : 0
+      };
+
+      const res = await fetch(
+        editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`,
+        {
+          method: editId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const result = await res.json();
+      if (!result.success) return alert(result.error || "Failed");
+
+      alert(editId ? "Updated Successfully" : "Added Successfully");
+      editId = null;
+      assetForm.reset();
+      toggleFields();
+      toggleMacField();
+      loadAssets(1);
+    });
+  }
+
+  // Init states
   toggleFields();
   toggleMacField();
-  loadAssets(1);
-});
+}
+
+/* 🔥 THIS IS MANDATORY */
+document.addEventListener("DOMContentLoaded", initApp);
 
 /* ================== LOAD ASSETS ================== */
 async function loadAssets(page = 1) {
