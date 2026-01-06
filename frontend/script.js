@@ -655,6 +655,23 @@ function initApp() {
   toggleMacField();
 }
 
+/* ================== CAMPUS → AREA ================== */
+if (campusSelect && areaRoomSelect) {
+  campusSelect.addEventListener("change", () => {
+    areaRoomSelect.innerHTML = `<option value="">Select Area / Room</option>`;
+
+    const areas = campusAreas[campusSelect.value];
+    if (!areas) return;
+
+    areas.forEach(area => {
+      const opt = document.createElement("option");
+      opt.value = area;
+      opt.textContent = area;
+      areaRoomSelect.appendChild(opt);
+    });
+  });
+}
+
 /* 🔥 THIS IS MANDATORY */
 document.addEventListener("DOMContentLoaded", initApp);
 
@@ -769,21 +786,6 @@ async function deleteAsset(id) {
   await fetch(`${API_BASE}/assets/${id}`, { method: "DELETE" });
   loadAssets(currentPage);
 }
-
-/* ================== CAMPUS → AREA ================== */
-
-campusSelect.addEventListener("change", () => {
-  areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
-  const areas = campusAreas[campusSelect.value];
-  if (!areas) return;
-
-  areas.forEach(a => {
-    const opt = document.createElement("option");
-    opt.value = a;
-    opt.textContent = a;
-    areaRoomSelect.appendChild(opt);
-  });
-});
 
 /* ================== charts ================== */
 function renderDashboardChart(data) {
