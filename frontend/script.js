@@ -449,10 +449,6 @@ const verificationDate = document.getElementById("verificationDate");
 const shopOrigin = document.getElementById("ShopOrigin");
 const assetPrice = document.getElementById("assetPrice");
 
-/* ===== Location (MUST BE BEFORE SUBMIT) ===== */
-const campusSelect = document.getElementById("campus");
-const areaRoomSelect = document.getElementById("areaRoom");
-
 /* ===== Dashboard (SAFE) ===== */
 const dashTable = document.getElementById("dashTable");
 const pagination = document.getElementById("pagination");
@@ -521,6 +517,10 @@ function calculateWarrantyPending() {
 }
 purchaseDate.addEventListener("change", calculateWarrantyPending);
 warrantyMonths.addEventListener("input", calculateWarrantyPending);
+
+/* ===== Location (MUST BE BEFORE SUBMIT) ===== */
+const campusSelect = document.getElementById("campus");
+const areaRoomSelect = document.getElementById("areaRoom");
 
 /* ================== FORM SUBMIT ================== */
 assetForm.addEventListener("submit", async e => {
@@ -703,6 +703,7 @@ async function deleteAsset(id) {
 }
 
 /* ================== CAMPUS → AREA ================== */
+
 campusSelect.addEventListener("change", () => {
   areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
   const areas = campusAreas[campusSelect.value];
@@ -715,6 +716,18 @@ campusSelect.addEventListener("change", () => {
     areaRoomSelect.appendChild(opt);
   });
 });
+
+/* ================== SWITCH PAGE ================== */
+
+function switchPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+  const pageEl = document.getElementById(`page-${page}`);
+  if (pageEl) pageEl.classList.add("active");
+
+  if (page === "dashboard") loadAssets(1);
+}
 
 /* ================== FILTER ================== */
 function applyFilters() {
