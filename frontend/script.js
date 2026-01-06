@@ -478,6 +478,9 @@ const searchInput = document.getElementById("searchInput") || { value: "" };
 const filterRole = document.getElementById("filterRole") || { value: "all" };
 const filterBatch = document.getElementById("filterBatch") || { value: "all" };
 
+const campusSelect = document.getElementById("campus");
+const areaRoomSelect = document.getElementById("areaRoom");
+
 /* ===== Recent ===== */
 function renderRecent(data) {
   const recentList = document.getElementById("recentList");
@@ -564,19 +567,20 @@ function initApp() {
 
   /* ===== CAMPUS → AREA ===== */
   if (campusSelect && areaRoomSelect) {
-    campusSelect.addEventListener("change", () => {
-      areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
-      const areas = campusAreas[campusSelect.value];
-      if (!areas) return;
+  campusSelect.addEventListener("change", () => {
+    areaRoomSelect.innerHTML = `<option value="">Select Area</option>`;
 
-      areas.forEach(room => {
-        const opt = document.createElement("option");
-        opt.value = room;
-        opt.textContent = room;
-        areaRoomSelect.appendChild(opt);
-      });
+    const areas = campusAreas[campusSelect.value];
+    if (!areas) return;
+
+    areas.forEach(room => {
+      const opt = document.createElement("option");
+      opt.value = room;
+      opt.textContent = room;
+      areaRoomSelect.appendChild(opt);
     });
-  }
+  });
+}
 
   /* ================== FORM SUBMIT ================== */
   if (assetForm) {
