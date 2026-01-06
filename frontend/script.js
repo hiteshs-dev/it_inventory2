@@ -825,7 +825,24 @@ function switchPage(page) {
 function applyFilters() {
   loadAssets(1);
 }
-renderDashboardChart(result.data);
+async function loadAssets(page = 1) {
+  currentPage = page;
+
+  const res = await fetch(
+    `${API_BASE}/assets?page=${page}&limit=${limit}`
+  );
+
+  const result = await res.json();
+  if (!result.data) return;
+
+  renderTable(result.data);
+  renderRecent(result.data);
+  renderPagination(result.total);
+  if (pageInfo) renderPageInfo(result.total);
+
+  // ✅ ADD THIS LINE HERE
+  renderDashboardChart(result.data);
+}
 
 /* ================== INIT ================== */
 toggleFields();
