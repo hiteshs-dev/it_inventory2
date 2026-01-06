@@ -392,6 +392,12 @@ const campusAreas = {
 };
 
 /* ================== download ================== */
+
+function downloadSpecific(role, batch) {
+  const url = `${API_BASE}/export?role=${role}&batch=${batch}`;
+  window.open(url, "_blank");
+}
+
 async function downloadBatch(batch) {
   const res = await fetch(`/api/assets?batch=${batch}&limit=10000`);
   const result = await res.json();
@@ -514,21 +520,29 @@ function initApp() {
   }
 
   /* ================== FIELD TOGGLES ================== */
-  function toggleFields() {
-    if (!role) return;
-    studentFields.style.display = role.value === "student" ? "block" : "none";
-    empFields.style.display = role.value === "employee" ? "block" : "none";
+function toggleFields() {
+  if (!role || !studentFields || !empFields) return;
+
+  studentFields.style.display =
+    role.value === "student" ? "block" : "none";
+  empFields.style.display =
+    role.value === "employee" ? "block" : "none";
+}
+
+if (role) role.addEventListener("change", toggleFields);
+
+function toggleMacField() {
+  if (!platform || !macField) return;
+
+  macField.style.display =
+    platform.value === "apple" ? "block" : "none";
+
+  if (platform.value !== "apple" && macAddress) {
+    macAddress.value = "";
   }
+}
 
-  if (role) role.addEventListener("change", toggleFields);
-
-  function toggleMacField() {
-    if (!platform) return;
-    macField.style.display = platform.value === "apple" ? "block" : "none";
-    if (platform.value !== "apple" && macAddress) macAddress.value = "";
-  }
-
-  if (platform) platform.addEventListener("change", toggleMacField);
+if (platform) platform.addEventListener("change", toggleMacField);
 
   /* ================== DOWNLOAD ================== */
   const download2026Btn = document.getElementById("download2026");
