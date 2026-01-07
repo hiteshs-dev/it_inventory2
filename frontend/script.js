@@ -551,13 +551,15 @@ function renderRecent(data) {
   if (!recentList) return;
 
   recentList.innerHTML = "";
-  data.slice(0, 5).forEach(d => {
-    recentList.innerHTML += `
-      <div class="recent-item">
-        ${d.name} — ${d.asset_type} (${d.serial_no})
-      </div>
-    `;
-  });
+  data
+    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0,5)
+    .forEach(d => {
+      recentList.innerHTML += `
+        <div class="recent-item">
+          ${d.name} — ${d.asset_type} (${d.serial_no})
+        </div>`;
+    });
 }
 
 function initApp() {
@@ -886,27 +888,41 @@ function applyFilters() {
 async function loadAssets(page = 1) {
   currentPage = page;
 
-  const q = searchInput?.value || "";
-  const roleFilter = filterRole?.value || "all";
-  const batchFilter = filterBatch?.value || "all";
-
-  const res = await fetch(
-    `${API_BASE}/assets?page=${page}&limit=${limit}&q=${encodeURIComponent(q)}&role=${roleFilter}&batch=${batchFilter}`
-  );
-
+  const res = await fetch(`${API_BASE}/assets?page=1&limit=10000`);
   const result = await res.json();
   if (!result.data) return;
 
-  dashboardData = result.data;
+  let data = result.data;
 
-  renderTable(result.data);
-  renderPagination(result.total);
-  if (pageInfo) renderPageInfo(result.total);
+  // 🔍 SEARCH
+  const q = searchInput.value.toLowerCase();
+  if (q) {
+    data = data.filter(d =>
+      Object.values(d).some(v =>
+        String(v || "").toLowerCase().includes(q)
+      )
+    );
+  }
 
-  renderStats(result.data);
-  renderRoleChart(result.data);
-  renderBatchChart(result.data);
+  // 🎭 ROLE FILTER
+  if (filterRole.value !== "all") {
+    data = data.filter(d => d.role === filterRole.value);
+  }
+
+  // 🎓 BATCH FILTER
+  if (filterBatch.value !== "all") {
+    data = data.filter(d => d.batch === filterBatch.value);
+  }
+
+  dashboardData = data;
+
+  renderRecent(data);
+  renderTable(data);
+  renderStats(data);
+  renderRoleChart(data);
+  renderBatchChart(data);
 }
+
 
 async function downloadExcel() {
   const res = await fetch(`${API_BASE}/assets?page=1&limit=100000`);

@@ -262,7 +262,23 @@
       <input id="hdd" type="text" placeholder="256 GB SSD / 1 TB HDD" />
     </div>
   </div>
+  
+  <div class="form-group">
+  <label>Platform</label>
+  <select id="platform">
+    <option value="">Select</option>
+    <option value="windows">Windows</option>
+    <option value="linux">Linux</option>
+    <option value="apple">Apple (Mac)</option>
+  </select>
+</div>
 
+<div class="form-group" id="macField" style="display:none">
+  <label>MAC Address</label>
+  <input id="macAddress" placeholder="AA:BB:CC:DD:EE:FF">
+</div>
+  
+  
   <!-- Maintenance -->
   <div class="form-row">
     <div class="form-group full-width">
