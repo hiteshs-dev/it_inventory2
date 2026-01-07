@@ -487,6 +487,28 @@ const filterBatch = document.getElementById("filterBatch") || { value: "all" };
 const campusSelect = document.getElementById("campus");
 const areaRoomSelect = document.getElementById("areaRoom");
 
+function toggleFields() {
+  const role = document.getElementById("role");
+  const studentFields = document.getElementById("studentFields");
+  const empFields = document.getElementById("empFields");
+
+  if (!role || !studentFields || !empFields) return;
+
+  studentFields.style.display = role.value === "student" ? "block" : "none";
+  empFields.style.display = role.value === "employee" ? "block" : "none";
+}
+
+function toggleMacField() {
+  const platform = document.getElementById("platform");
+  const macField = document.getElementById("macField");
+  const macAddress = document.getElementById("macAddress");
+
+  if (!platform || !macField) return;
+
+  macField.style.display = platform.value === "apple" ? "block" : "none";
+  if (platform.value !== "apple" && macAddress) macAddress.value = "";
+}
+
 /* ===== Recent ===== */
 function renderRecent(data) {
   const recentList = document.getElementById("recentList");
@@ -520,27 +542,7 @@ function initApp() {
   }
 
   /* ================== FIELD TOGGLES ================== */
-function toggleFields() {
-  const role = document.getElementById("role");
-  const studentFields = document.getElementById("studentFields");
-  const empFields = document.getElementById("empFields");
 
-  if (!role || !studentFields || !empFields) return;
-
-  studentFields.style.display = role.value === "student" ? "block" : "none";
-  empFields.style.display = role.value === "employee" ? "block" : "none";
-}
-
-function toggleMacField() {
-  const platform = document.getElementById("platform");
-  const macField = document.getElementById("macField");
-  const macAddress = document.getElementById("macAddress");
-
-  if (!platform || !macField) return;
-
-  macField.style.display = platform.value === "apple" ? "block" : "none";
-  if (platform.value !== "apple" && macAddress) macAddress.value = "";
-}
 document.addEventListener("DOMContentLoaded", () => {
   const role = document.getElementById("role");
   const platform = document.getElementById("platform");
