@@ -3,20 +3,6 @@ window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  initApp();
-});
-
-if (role) {
-    role.addEventListener("change", toggleFields);
-    toggleFields(); // ✅ SAFE HERE
-  }
-
-  if (platform) {
-    platform.addEventListener("change", toggleMacField);
-    toggleMacField(); // ✅ SAFE HERE
-  }
-
 /* ================== API ================== */
 const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
@@ -536,6 +522,17 @@ function renderRecent(data) {
 
 function initApp() {
 
+  /* ===== FIELD TOGGLES ===== */
+  if (role) {
+    role.addEventListener("change", toggleFields);
+    toggleFields(); // initial state
+  }
+
+  if (platform) {
+    platform.addEventListener("change", toggleMacField);
+    toggleMacField(); // initial state
+  }
+
   /* ===== LOGIN ===== */
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
@@ -709,26 +706,6 @@ if (campusSelect && areaRoomSelect) {
   });
 }
 
-/* 🔥 THIS IS MANDATORY */
-document.addEventListener("DOMContentLoaded", initApp);
-
-/* ================== LOAD ASSETS ================== */
-async function loadAssets(page = 1) {
-  currentPage = page;
-
-  const res = await fetch(
-    `${API_BASE}/assets?page=${page}&limit=${limit}`
-  );
-
-  const result = await res.json();
-  if (!result.data) return;
-
-  renderTable(result.data);
-  renderRecent(result.data);
-  renderPagination(result.total);
-  if (pageInfo) renderPageInfo(result.total);
-}
-
 /* ================== TABLE ================== */
 function renderTable(data) {
   dashTable.innerHTML = "";
@@ -880,3 +857,5 @@ async function loadAssets(page = 1) {
   // ✅ ADD THIS LINE HERE
   renderDashboardChart(result.data);
 }
+
+document.addEventListener("DOMContentLoaded", initApp);
