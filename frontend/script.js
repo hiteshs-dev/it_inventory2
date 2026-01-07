@@ -842,16 +842,18 @@ async function deleteAsset(id) {
 }
 
 /* ================== charts ================== */
-function renderDashboardChart(data) {
-  const ctx = document.getElementById("assetChart");
+function renderBatchChart(data) {
+  const ctx = document.getElementById("batchChart");
   if (!ctx) return;
 
   const counts = {};
-  data.forEach(a => {
-    counts[a.asset_type] = (counts[a.asset_type] || 0) + 1;
+  data.forEach(d => {
+    if (d.batch) counts[d.batch] = (counts[d.batch] || 0) + 1;
   });
 
-  new Chart(ctx, {
+  if (batchChartInstance) batchChartInstance.destroy();
+
+  batchChartInstance = new Chart(ctx, {
     type: "bar",
     data: {
       labels: Object.keys(counts),
@@ -859,9 +861,11 @@ function renderDashboardChart(data) {
         label: "Assets",
         data: Object.values(counts)
       }]
-    }
+    },
+    options: { responsive: true }
   });
 }
+
 
 /* ================== SWITCH PAGE ================== */
 
@@ -882,20 +886,26 @@ function applyFilters() {
 async function loadAssets(page = 1) {
   currentPage = page;
 
+  const q = searchInput?.value || "";
+  const roleFilter = filterRole?.value || "all";
+  const batchFilter = filterBatch?.value || "all";
+
   const res = await fetch(
-    `${API_BASE}/assets?page=${page}&limit=${limit}`
+    `${API_BASE}/assets?page=${page}&limit=${limit}&q=${encodeURIComponent(q)}&role=${roleFilter}&batch=${batchFilter}`
   );
 
   const result = await res.json();
   if (!result.data) return;
 
+  dashboardData = result.data;
+
   renderTable(result.data);
-  renderRecent(result.data);
   renderPagination(result.total);
   if (pageInfo) renderPageInfo(result.total);
 
-  // ✅ ADD THIS LINE HERE
-  renderDashboardChart(result.data);
+  renderStats(result.data);
+  renderRoleChart(result.data);
+  renderBatchChart(result.data);
 }
 
 async function downloadExcel() {
