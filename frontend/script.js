@@ -505,10 +505,8 @@ function toggleMacField() {
   const macField = document.getElementById("macField");
   const macAddress = document.getElementById("macAddress");
 
-  if (!platform || !macField) return;
-
-  macField.style.display = platform.value === "apple" ? "block" : "none";
-  if (platform.value !== "apple" && macAddress) macAddress.value = "";
+  if (!macField) return;
+  macField.style.display = "block"; // ✅ ALWAYS SHOW
 }
 
 /* ===== dashboard render ===== */
@@ -685,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
         purchase_date: purchaseDate.value,
 
         platform: platform.value,
-        mac_address: platform.value === "apple" ? macAddress.value : "",
+        mac_address: macAddress.value || "",
 
         brand: brand.value,
         model: model.value,
