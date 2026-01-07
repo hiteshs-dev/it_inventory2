@@ -7,6 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
   initApp();
 });
 
+if (role) {
+    role.addEventListener("change", toggleFields);
+    toggleFields(); // ✅ SAFE HERE
+  }
+
+  if (platform) {
+    platform.addEventListener("change", toggleMacField);
+    toggleMacField(); // ✅ SAFE HERE
+  }
+
 /* ================== API ================== */
 const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
@@ -870,7 +880,3 @@ async function loadAssets(page = 1) {
   // ✅ ADD THIS LINE HERE
   renderDashboardChart(result.data);
 }
-
-/* ================== INIT ================== */
-toggleFields();
-toggleMacField();
