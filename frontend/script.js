@@ -3,6 +3,12 @@ window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
 };
 
+/* ================== dashboard ================== */
+let dashboardData = [];
+let roleChartInstance = null;
+let batchChartInstance = null;
+
+
 /* ================== API ================== */
 const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
@@ -505,6 +511,40 @@ function toggleMacField() {
   if (platform.value !== "apple" && macAddress) macAddress.value = "";
 }
 
+/* ===== dashboard render ===== */
+function renderStats(data) {
+  const total = data.length;
+  const students = data.filter(d => d.role === "student").length;
+  const employees = data.filter(d => d.role === "employee").length;
+
+  document.getElementById("statTotal").innerText = total;
+  document.getElementById("statStudents").innerText = students;
+  document.getElementById("statEmployees").innerText = employees;
+}
+
+function renderRoleChart(data) {
+  const ctx = document.getElementById("roleChart");
+  if (!ctx) return;
+
+  const counts = { student: 0, employee: 0 };
+  data.forEach(d => counts[d.role]++);
+
+  if (roleChartInstance) roleChartInstance.destroy();
+
+  roleChartInstance = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: ["Students", "Employees"],
+      datasets: [{
+        data: [counts.student, counts.employee]
+      }]
+    },
+    options: {
+      responsive: true
+    }
+  });
+}
+
 /* ===== Recent ===== */
 function renderRecent(data) {
   const recentList = document.getElementById("recentList");
@@ -856,6 +896,22 @@ async function loadAssets(page = 1) {
 
   // ✅ ADD THIS LINE HERE
   renderDashboardChart(result.data);
+}
+
+async function downloadExcel() {
+  const res = await fetch(`${API_BASE}/assets?page=1&limit=100000`);
+  const result = await res.json();
+
+  if (!result.data || !result.data.length) {
+    alert("No data to export");
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(result.data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Assets");
+
+  XLSX.writeFile(wb, "ITM_Assets.xlsx");
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
