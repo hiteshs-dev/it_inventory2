@@ -853,6 +853,9 @@ async function editAsset(id) {
   verificationDate.value = a.verification_date || "";
   shopOrigin.value = a.shop_origin || "";
   purchasePrice.value = a.purchase_price || "";
+  purchaseAssetDate.value = a.purchase_date || "";
+  asset_price.value = a.asset_price || "";
+  macAddress.value = a.mac_address || "";
 
   toggleFields();
   toggleMacField();
@@ -903,62 +906,67 @@ function switchPage(page) {
 }
 
 /* ================== FILTER ================== */
-function applyFilters() {
-  loadAssets(1);
-}
 async function loadAssets(page = 1) {
   currentPage = page;
 
   const res = await fetch(`${API_BASE}/assets?page=1&limit=10000`);
   const result = await res.json();
-  if (!result.data) return;
 
-  let data = result.data;
+  dashboardData = result.data;
+  applyFilters();
+}
 
   // 🔍 SEARCH
+  function applyFilters() {
+  let filtered = [...dashboardData];
+
   const q = searchInput.value.toLowerCase();
+  const roleVal = filterRole.value;
+  const batchVal = filterBatch.value;
+
   if (q) {
-    data = data.filter(d =>
-      Object.values(d).some(v =>
-        String(v || "").toLowerCase().includes(q)
-      )
+    filtered = filtered.filter(d =>
+      d.name?.toLowerCase().includes(q) ||
+      d.serial_no?.toLowerCase().includes(q) ||
+      d.location?.toLowerCase().includes(q)
     );
   }
 
-  // 🎭 ROLE FILTER
-  if (filterRole.value !== "all") {
-    data = data.filter(d => d.role === filterRole.value);
+  if (roleVal !== "all") {
+    filtered = filtered.filter(d => d.role === roleVal);
   }
 
-  // 🎓 BATCH FILTER
-  if (filterBatch.value !== "all") {
-    data = data.filter(d => d.batch === filterBatch.value);
+  if (batchVal !== "all") {
+    filtered = filtered.filter(d => d.batch === batchVal);
   }
 
-  dashboardData = data;
-
-  renderRecent(data);
-  renderTable(data);
-  renderStats(data);
-  renderRoleChart(data);
-  renderBatchChart(data);
+  renderTable(filtered);
+  renderStats(filtered);
+  renderRoleChart(filtered);
+  renderRecent(filtered);
 }
-
 
 async function downloadExcel() {
-  const res = await fetch(`${API_BASE}/assets?page=1&limit=100000`);
-  const result = await res.json();
+  if (!dashboardData.length) return alert("No data");
 
-  if (!result.data || !result.data.length) {
-    alert("No data to export");
-    return;
-  }
+  const filtered = dashboardData.filter(d =>
+    d.name?.toLowerCase().includes(searchInput.value.toLowerCase())
+  );
 
-  const ws = XLSX.utils.json_to_sheet(result.data);
+  const ws = XLSX.utils.json_to_sheet(filtered);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Assets");
-
-  XLSX.writeFile(wb, "ITM_Assets.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "Filtered Assets");
+  XLSX.writeFile(wb, "Filtered_Assets.xlsx");
 }
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+showToast("✅ Asset saved successfully");
+showToast("🗑 Asset deleted");
 
 document.addEventListener("DOMContentLoaded", initApp);

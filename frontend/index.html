@@ -303,40 +303,45 @@
         </div>
 
         <!-- ACCOUNTING -->
-        <h3 class="section-title">Accounting</h3>
+<h3 class="section-title">Accounting</h3>
 
-        <div class="form-row">
-          <input
-          type="text"
-          id="shopOrigin"
-          placeholder="Shop / Origin"
-          >
+<div class="form-row gap-lg">
+  <div class="form-group">
+    <label>Shop / Origin</label>
+    <input type="text" id="shopOrigin" class="underline-input">
+  </div>
 
-        <input
-          type="number"
-          id="asset_price"
-          placeholder="Purchase Price (₹)"
-          >
-        </div>
+  <div class="form-group">
+    <label>Purchase Price (₹)</label>
+    <input type="number" id="asset_price" class="underline-input">
+  </div>
+</div>
 
-        <div class="form-row">
-        <input
-          type="date"
-          id="purchaseAssetDate"
-          placeholder="Purchase Asset Date"
-          >
+<div class="form-row gap-lg">
+  <div class="form-group">
+    <label>Asset Purchase Date</label>
+    <input type="date" id="purchaseAssetDate" class="underline-input">
+  </div>
 
-        <input
-          type="file"
-          id="invoiceFiles"
-          multiple
-          accept=".pdf,.jpg,.jpeg,.png"
-          >
-        </div>
+  <div class="form-group">
+    <label>Upload Invoice</label>
 
-        <small class="hint">
-          📎 Upload max <b>5 files</b>, each up to <b>10 MB</b>
-        </small>
+    <label class="file-upload">
+      📄 Choose Invoice Files
+      <input
+        type="file"
+        id="invoiceFiles"
+        multiple
+        accept=".pdf,.jpg,.jpeg,.png"
+        hidden
+      >
+    </label>
+
+    <small class="hint">
+      📎 Upload max <b>5 files</b>, each up to <b>10 MB</b>
+    </small>
+  </div>
+</div>
 
 
         <!-- VERIFICATION -->
@@ -433,6 +438,9 @@
 
 <!-- PAGINATION BUTTONS -->
 <div id="pagination" class="pagination"></div>
+
+<!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
 
 </main>
 
