@@ -656,6 +656,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 }
 
+  /* ================== Invoice downlaod logic  ================== */
+const invoiceInput = document.getElementById("invoiceFiles");
+
+if (invoiceInput) {
+  invoiceInput.addEventListener("change", () => {
+    const files = invoiceInput.files;
+
+    if (files.length > 5) {
+      alert("Maximum 5 invoice files allowed");
+      invoiceInput.value = "";
+      return;
+    }
+
+    for (const file of files) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`${file.name} exceeds 10MB limit`);
+        invoiceInput.value = "";
+        return;
+      }
+    }
+  });
+}
+
   /* ================== FORM SUBMIT ================== */
   if (assetForm) {
     assetForm.addEventListener("submit", async (e) => {
