@@ -478,6 +478,11 @@ const verificationremarks = document.getElementById("verificationremarks");
 const shopOrigin = document.getElementById("shopOrigin");
 const assetPrice = document.getElementById("asset_price");
 
+/* ===== Invoice Upload ===== */
+const invoiceInput = document.getElementById("invoiceFiles");
+const filePreview = document.getElementById("filePreview");
+const uploadProgress = document.getElementById("uploadProgress");
+
 /* ===== Dashboard (SAFE) ===== */
 const dashTable = document.getElementById("dashTable");
 const pagination = document.getElementById("pagination");
@@ -648,31 +653,6 @@ if (loginForm) {
 }
 
   /* ================== Invoice downlaod logic  ================== */
-const invoiceInput = document.getElementById("invoiceFiles");
-
-if (invoiceInput) {
-  invoiceInput.addEventListener("change", () => {
-    const files = invoiceInput.files;
-
-    if (files.length > 5) {
-      alert("Maximum 5 invoice files allowed");
-      invoiceInput.value = "";
-      return;
-    }
-
-    for (const file of files) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`${file.name} exceeds 10MB limit`);
-        invoiceInput.value = "";
-        return;
-      }
-    }
-  });
-}
-}
-
-const filePreview = document.getElementById("filePreview");
-const uploadProgress = document.getElementById("uploadProgress");
 
 if (invoiceInput) {
   invoiceInput.addEventListener("change", () => {
@@ -690,7 +670,7 @@ if (invoiceInput) {
     }, 1000);
   });
 }
-
+}
   /* ================== FORM SUBMIT ================== */
 if (assetForm) {
   assetForm.addEventListener("submit", async (e) => {
@@ -994,9 +974,12 @@ async function loadAssets(page = 1) {
   const res = await fetch(
     `${API_BASE}/assets?page=${page}&limit=${limit}`
   );
-  const result = await res.json();
-
-  if (!result.data) return;
+  /* ================== Failed Save ================== */
+    const result = await res.json();
+     if (!res.ok) {
+     alert(result.error || "Save failed");
+    return;
+    }
 
   dashboardData = result.data; // 🔥 REQUIRED
 
