@@ -40,26 +40,10 @@
   </div>
 
   <nav class="nav-tabs" id="navTabs" style="display:none;">
-  <button
-    class="nav-btn active"
-    data-page="entry"
-    onclick="switchPage('entry', this)">
-    Data Entry
-  </button>
-
-  <button
-    class="nav-btn"
-    data-page="dashboard"
-    onclick="switchPage('dashboard', this)">
-    Dashboard
-  </button>
-
-  <button
-    class="nav-btn"
-    onclick="logout()">
-    Logout
-  </button>
-</nav>
+  <button class="nav-btn active" onclick="switchPage('entry', this)">Data Entry</button>
+  <button class="nav-btn" onclick="switchPage('dashboard', this)">Dashboard</button>
+  <button class="nav-btn" onclick="logout('logout', this)">Logout</button>
+  </nav>
 
 </header>
 

@@ -925,26 +925,16 @@ function renderBatchChart(data) {
 /* ================== SWITCH PAGE ================== */
 
 function switchPage(page, btn) {
-  // Pages
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const pageEl = document.getElementById(`page-${page}`);
-  if (pageEl) pageEl.classList.add("active");
+  document.getElementById("page-" + page)?.classList.add("active");
 
-  // Nav underline FIX
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-
-  if (btn) {
-    btn.classList.add("active");
-  } else {
-    const autoBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
-    if (autoBtn) autoBtn.classList.add("active");
-  }
+  if (btn) btn.classList.add("active");
 
   if (page === "dashboard") {
     loadAssets(1);
   }
 }
-
 
   // 🔍 SEARCH
   function applyFilters() {
