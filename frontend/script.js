@@ -895,25 +895,20 @@ function renderBatchChart(data) {
 
 /* ================== SWITCH PAGE ================== */
 
-function switchPage(page) {
+function switchPage(page, btn) {
+  // Pages
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-
   const pageEl = document.getElementById(`page-${page}`);
   if (pageEl) pageEl.classList.add("active");
 
-  if (page === "dashboard") loadAssets(1);
-}
+  // Nav underline
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
 
-/* ================== FILTER ================== */
-async function loadAssets(page = 1) {
-  currentPage = page;
-
-  const res = await fetch(`${API_BASE}/assets?page=1&limit=10000`);
-  const result = await res.json();
-
-  dashboardData = result.data;
-  applyFilters();
+  // Load dashboard data
+  if (page === "dashboard") {
+    loadAssets(1);
+  }
 }
 
   // 🔍 SEARCH
