@@ -971,17 +971,15 @@ function showToast(msg) {
 async function loadAssets(page = 1) {
   currentPage = page;
 
-  const res = await fetch(
-    `${API_BASE}/assets?page=${page}&limit=${limit}`
-  );
-  /* ================== Failed Save ================== */
-    const result = await res.json();
-     if (!res.ok) {
-     alert(result.error || "Save failed");
-    return;
-    }
+  const res = await fetch(`${API_BASE}/assets?page=${page}&limit=${limit}`);
+  const result = await res.json();
 
-  dashboardData = result.data; // 🔥 REQUIRED
+  if (!res.ok) {
+    alert(result.error || "Load failed");
+    return;
+  }
+
+  dashboardData = result.data;
 
   renderTable(dashboardData);
   renderStats(dashboardData);
@@ -997,12 +995,5 @@ async function loadAssets(page = 1) {
 showToast("✅ Asset saved successfully");
 showToast("🗑 Asset deleted");
 showToast("✏️ Editing asset — update details and submit");
-
-/* ================== Failed Save ================== */
-const result = await res.json();
-if (!res.ok) {
-  alert(result.error || "Save failed");
-  return;
-}
 
 document.addEventListener("DOMContentLoaded", initApp);
