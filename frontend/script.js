@@ -575,19 +575,25 @@ function initApp() {
   }
 
   /* ===== LOGIN ===== */
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
+  const loginForm = document.getElementById("loginForm");
 
-      if (username.value === "admin" && password.value === "unix@2026") {
-        loginModal.style.display = "none";
-        navTabs.style.display = "flex";
-        loadAssets(1);
-      } else {
-        loginError.style.display = "block";
-      }
-    });
-  }
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    if (user === "admin" && pass === "unix@2026") {
+      document.getElementById("loginModal").style.display = "none";
+      document.getElementById("navTabs").style.display = "flex";
+      switchPage("entry");     // open Data Entry page
+      loadAssets(1);           // load dashboard data
+    } else {
+      document.getElementById("loginError").style.display = "block";
+    }
+  });
+}
 
   /* ================== DOWNLOAD ================== */
   const download2026Btn = document.getElementById("download2026");
