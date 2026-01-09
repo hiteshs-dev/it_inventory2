@@ -40,10 +40,27 @@
   </div>
 
   <nav class="nav-tabs" id="navTabs" style="display:none;">
-    <button class="nav-btn active" onclick="switchPage('entry')">Data Entry</button>
-    <button class="nav-btn" onclick="switchPage('dashboard')">Dashboard</button>
-    <button class="nav-btn" onclick="logout()">Logout</button>
-  </nav>
+  <button
+    class="nav-btn active"
+    data-page="entry"
+    onclick="switchPage('entry', this)">
+    Data Entry
+  </button>
+
+  <button
+    class="nav-btn"
+    data-page="dashboard"
+    onclick="switchPage('dashboard', this)">
+    Dashboard
+  </button>
+
+  <button
+    class="nav-btn"
+    onclick="logout()">
+    Logout
+  </button>
+</nav>
+
 </header>
 
 <!-- ================= MAIN ================= -->
@@ -99,7 +116,7 @@
           <select id="entity">
             <option value="">Select Entity</option>
             <option value="ITM Trust">ITM Trust</option>
-            <option value="EduTech">EduTech</option>
+            <option value="EduTech">ITM EduTech</option>
           </select>
         </div>
 
@@ -158,8 +175,6 @@
               <option>WAR.Campus</option>
               <option>Scrap.ITMGroup</option>
               <option>PanIndia.ISA.Offices</option>
-              <option>Virtual.Hosting</option>
-              <option>IDC.Hosting</option>
             </select>
           </div>
 
@@ -335,6 +350,9 @@
         accept=".pdf,.jpg,.jpeg,.png"
         hidden
       >
+
+      <div id="filePreview"></div>
+      <div id="uploadProgress"></div>
     </label>
 
     <small class="hint">
@@ -351,7 +369,7 @@
           <input type="date" id="verificationDate">
         </div>
 
-        <textarea id="remarks" placeholder="Remarks"></textarea>
+        <textarea id="verificationremarks" placeholder="Verification Remarks"></textarea>
 
         <button class="btn-submit" type="submit">Submit Entry</button>
       </form>

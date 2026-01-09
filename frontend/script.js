@@ -472,10 +472,11 @@ const warrantyInfo = document.getElementById("warrantyInfo");
 /* ===== Verification ===== */
 const verifiedBy = document.getElementById("verifiedBy");
 const verificationDate = document.getElementById("verificationDate");
+const verificationremarks = document.getElementById("verificationremarks");
 
 /* ===== Accounting ===== */
-const shopOrigin = document.getElementById("ShopOrigin");
-const assetPrice = document.getElementById("assetPrice");
+const shopOrigin = document.getElementById("shopOrigin");
+const assetPrice = document.getElementById("asset_price");
 
 /* ===== Dashboard (SAFE) ===== */
 const dashTable = document.getElementById("dashTable");
@@ -588,22 +589,6 @@ function initApp() {
     });
   }
 
-  /* ================== FIELD TOGGLES ================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-  const role = document.getElementById("role");
-  const platform = document.getElementById("platform");
-
-  if (role) {
-    role.addEventListener("change", toggleFields);
-    toggleFields(); // run once on load
-  }
-
-  if (platform) {
-    platform.addEventListener("change", toggleMacField);
-    toggleMacField(); // run once on load
-  }
-});
   /* ================== DOWNLOAD ================== */
   const download2026Btn = document.getElementById("download2026");
   if (download2026Btn) {
@@ -678,79 +663,102 @@ if (invoiceInput) {
     }
   });
 }
+}
+
+const filePreview = document.getElementById("filePreview");
+const uploadProgress = document.getElementById("uploadProgress");
+
+if (invoiceInput) {
+  invoiceInput.addEventListener("change", () => {
+    filePreview.innerHTML = "";
+    uploadProgress.innerHTML = "Uploading...";
+
+    [...invoiceInput.files].forEach(file => {
+      const div = document.createElement("div");
+      div.textContent = file.name;
+      filePreview.appendChild(div);
+    });
+
+    setTimeout(() => {
+      uploadProgress.innerHTML = "✅ Upload complete";
+    }, 1000);
+  });
+}
 
   /* ================== FORM SUBMIT ================== */
-  if (assetForm) {
-    assetForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+if (assetForm) {
+  assetForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const payload = {
-        role: role.value,
-        title: title.value,
-        name: nameField.value,
-        email: email.value,
+    const payload = {
+      role: role.value,
+      title: title.value,
+      name: nameField.value,
+      email: email.value,
 
-        batch: role.value === "student" ? batch.value : "",
-        roll_no: role.value === "student" ? rollNo.value : "",
-        department: role.value === "employee" ? dept.value : "",
-        designation: role.value === "employee" ? designation.value : "",
-        emp_id: role.value === "employee" ? empId.value : "",
+      batch: role.value === "student" ? batch.value : "",
+      roll_no: role.value === "student" ? rollNo.value : "",
+      department: role.value === "employee" ? dept.value : "",
+      designation: role.value === "employee" ? designation.value : "",
+      emp_id: role.value === "employee" ? empId.value : "",
 
-        entity: document.getElementById("entity")?.value || "",
-        campus: campusSelect?.value || "",
-        area_room: areaRoomSelect?.value || "",
+      entity: document.getElementById("entity")?.value || "",
+      campus: campusSelect?.value || "",
+      area_room: areaRoomSelect?.value || "",
 
-        asset_desc: assetDesc.value,
-        asset_type: assetType.value,
-        serial_no: assetId.value,
-        purchase_date: purchaseDate.value,
+      asset_desc: assetDesc.value,
+      asset_type: assetType.value,
+      serial_no: assetId.value,
+      purchase_date: purchaseDate.value,
 
-        platform: platform.value,
-        mac_address: macAddress.value || "",
+      platform: platform.value,
+      mac_address: macAddress.value || "",
 
-        brand: brand.value,
-        model: model.value,
-        ram: ram.value,
-        processor: processor.value,
-        storage: hdd.value,
-        remarks: remarks.value,
+      brand: brand.value,
+      model: model.value,
+      ram: ram.value,
+      processor: processor.value,
+      storage: hdd.value,
+      remarks: remarks.value,
 
-        warranty_months: warrantyMonths.value,
-        warranty_pending: warrantyPending.value,
-        warranty_info: warrantyInfo.value,
+      warranty_months: warrantyMonths.value,
+      warranty_pending: warrantyPending.value,
+      warranty_info: warrantyInfo.value,
 
-        verified_by: verifiedBy.value,
-        verification_date: verificationDate.value,
+      verified_by: verifiedBy.value,
+      verification_date: verificationDate.value,
 
-        shop_origin: shopOrigin.value,
-        asset_price: assetPrice?.value ? parseInt(assetPrice.value) : 0
-      };
+      shop_origin: shopOrigin.value,
+      asset_price: assetPrice?.value
+        ? parseInt(assetPrice.value)
+        : 0
+    };
 
-      const res = await fetch(
-        editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`,
-        {
-          method: editId ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }
-      );
+    const res = await fetch(
+      editId ? `${API_BASE}/assets/${editId}` : `${API_BASE}/assets`,
+      {
+        method: editId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
 
-      const result = await res.json();
-      if (!result.success) return alert(result.error || "Failed");
+    const result = await res.json();
+    if (!result.success) return alert(result.error || "Failed");
 
-      alert(editId ? "Updated Successfully" : "Added Successfully");
-      editId = null;
-      assetForm.reset();
-      toggleFields();
-      toggleMacField();
-      loadAssets(1);
-    });
-  }
+    alert(editId ? "Updated Successfully" : "Added Successfully");
 
-  // Init states
-  toggleFields();
-  toggleMacField();
+    editId = null;
+    assetForm.reset();
+    toggleFields();
+    toggleMacField();
+    loadAssets(1);
+  });
 }
+
+/* Init UI state */
+toggleFields();
+toggleMacField();
 
 /* ================== CAMPUS → AREA ================== */
 if (campusSelect && areaRoomSelect) {
@@ -818,48 +826,63 @@ function renderPageInfo(total) {
 async function editAsset(id) {
   const res = await fetch(`${API_BASE}/assets?page=1&limit=10000`);
   const result = await res.json();
-  const a = result.data.find(x => x.id === id);
-  if (!a) return;
 
+  if (!result.data) {
+    alert("Failed to load assets");
+    return;
+  }
+
+  const a = result.data.find(x => x.id === id);
+  if (!a) {
+    alert("Asset not found");
+    return;
+  }
+
+  // 🔐 Set edit mode
   editId = id;
 
-  role.value = a.role;
-  title.value = a.title;
-  nameField.value = a.name;
-  email.value = a.email;
+  // Switch to entry page
+  const entryBtn = document.querySelector('.nav-btn[data-page="entry"]');
+  switchPage("entry", entryBtn);
+
+  // Fill form
+  role.value = a.role || "";
+  title.value = a.title || "";
+  nameField.value = a.name || "";
+  email.value = a.email || "";
+
   batch.value = a.batch || "";
   rollNo.value = a.roll_no || "";
   dept.value = a.department || "";
   designation.value = a.designation || "";
   empId.value = a.emp_id || "";
+
   campusSelect.value = a.campus || "";
   areaRoomSelect.value = a.area_room || "";
-  assetDesc.value = a.asset_desc;
-  assetType.value = a.asset_type;
-  assetId.value = a.serial_no;
-  purchaseDate.value = a.purchase_date;
+
+  assetDesc.value = a.asset_desc || "";
+  assetType.value = a.asset_type || "";
+  assetId.value = a.serial_no || "";
+  purchaseDate.value = a.purchase_date || "";
+
   platform.value = a.platform || "";
   macAddress.value = a.mac_address || "";
+
   brand.value = a.brand || "";
   model.value = a.model || "";
   ram.value = a.ram || "";
   processor.value = a.processor || "";
   hdd.value = a.storage || "";
   remarks.value = a.remarks || "";
-  warrantyMonths.value = a.warranty_months || "";
-  warrantyPending.value = a.warranty_pending || "";
-  warrantyInfo.value = a.warranty_info || "";
-  verifiedBy.value = a.verified_by || "";
-  verificationDate.value = a.verification_date || "";
+
   shopOrigin.value = a.shop_origin || "";
-  purchasePrice.value = a.purchase_price || "";
-  purchaseAssetDate.value = a.purchase_date || "";
-  asset_price.value = a.asset_price || "";
-  macAddress.value = a.mac_address || "";
+  assetPrice.value = a.asset_price || "";
+  purchaseAssetDate.value = a.purchase_asset_date || "";
 
   toggleFields();
   toggleMacField();
 }
+
 
 async function deleteAsset(id) {
   if (!confirm("Delete asset?")) return;
@@ -901,15 +924,21 @@ function switchPage(page, btn) {
   const pageEl = document.getElementById(`page-${page}`);
   if (pageEl) pageEl.classList.add("active");
 
-  // Nav underline
+  // Nav underline FIX
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
 
-  // Load dashboard data
+  if (btn) {
+    btn.classList.add("active");
+  } else {
+    const autoBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
+    if (autoBtn) autoBtn.classList.add("active");
+  }
+
   if (page === "dashboard") {
     loadAssets(1);
   }
 }
+
 
   // 🔍 SEARCH
   function applyFilters() {
@@ -920,12 +949,13 @@ function switchPage(page, btn) {
   const batchVal = filterBatch.value;
 
   if (q) {
-    filtered = filtered.filter(d =>
-      d.name?.toLowerCase().includes(q) ||
-      d.serial_no?.toLowerCase().includes(q) ||
-      d.location?.toLowerCase().includes(q)
-    );
-  }
+  filtered = filtered.filter(d =>
+    d.name?.toLowerCase().includes(q) ||
+    d.serial_no?.toLowerCase().includes(q) ||
+    d.campus?.toLowerCase().includes(q) ||
+    d.area_room?.toLowerCase().includes(q)
+  );
+}
 
   if (roleVal !== "all") {
     filtered = filtered.filter(d => d.role === roleVal);
@@ -961,7 +991,39 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove("show"), 2500);
 }
 
+/* ================== Loadassets ================== */
+async function loadAssets(page = 1) {
+  currentPage = page;
+
+  const res = await fetch(
+    `${API_BASE}/assets?page=${page}&limit=${limit}`
+  );
+  const result = await res.json();
+
+  if (!result.data) return;
+
+  dashboardData = result.data; // 🔥 REQUIRED
+
+  renderTable(dashboardData);
+  renderStats(dashboardData);
+  renderRoleChart(dashboardData);
+  renderBatchChart(dashboardData);
+  renderRecent(dashboardData);
+  renderPagination(result.total);
+  renderPageInfo(result.total);
+}
+
+
+/* ================== FEEDBACK ================== */
 showToast("✅ Asset saved successfully");
 showToast("🗑 Asset deleted");
+showToast("✏️ Editing asset — update details and submit");
+
+/* ================== Failed Save ================== */
+const result = await res.json();
+if (!res.ok) {
+  alert(result.error || "Save failed");
+  return;
+}
 
 document.addEventListener("DOMContentLoaded", initApp);
