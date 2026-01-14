@@ -45,42 +45,59 @@ export default {
 
       await env.DB.prepare(`
         INSERT INTO assets (
-          role, title, name, email, batch, roll_no,
-          department, designation, emp_id, location,
-          platform, mac_address,
-          asset_desc, asset_type, serial_no, purchase_date,
-          brand, model, ram, processor, storage, remarks
-        ) VALUES (
-          ?, ?, ?, ?, ?, ?,
-          ?, ?, ?, ?,
-          ?, ?,
-          ?, ?, ?, ?,
-          ?, ?, ?, ?, ?, ?
-        )
-      `).bind(
-        data.role,
-        data.title,
-        data.name,
-        data.email,
-        data.batch || "",
-        data.roll_no || "",
-        data.department || "",
-        data.designation || "",
-        data.emp_id || "",
-        data.location || "",
-        data.platform || "",
-        data.mac_address || "",
-        data.asset_desc,
-        data.asset_type,
-        data.serial_no,
-        data.purchase_date || "",
-        data.brand || "",
-        data.model || "",
-        data.ram || "",
-        data.processor || "",
-        data.storage || "",
-        data.remarks || ""
-      ).run();
+  role, title, name, email,
+  batch, roll_no, department, designation, emp_id,
+  entity, campus, area_room,
+  asset_desc, asset_type, serial_no, purchase_date,
+  platform, mac_address,
+  brand, model, ram, processor, storage, remarks,
+  warranty_months, warranty_pending, warranty_info,
+  verified_by, verification_date,
+  shop_origin, asset_price, location
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`).bind(
+  data.role,
+  data.title,
+  data.name,
+  data.email,
+  data.batch,
+  data.roll_no,
+  data.department,
+  data.designation,
+  data.emp_id,
+
+  data.entity,
+  data.campus,
+  data.area_room,
+
+  data.asset_desc,
+  data.asset_type,
+  data.serial_no,
+  data.purchase_date,
+
+  data.platform,
+  data.mac_address,
+
+  data.brand,
+  data.model,
+  data.ram,
+  data.processor,
+  data.storage,
+  data.remarks,
+
+  data.warranty_months,
+  data.warranty_pending,
+  data.warranty_info,
+
+  data.verified_by,
+  data.verification_date,
+
+  data.shop_origin,
+  data.asset_price,
+  data.location
+).run();
+
 
       return new Response(
         JSON.stringify({ success: true }),

@@ -773,7 +773,7 @@ function renderTable(data) {
         <td>${d.role}</td>
         <td>${d.asset_type}</td>
         <td>${d.serial_no}</td>
-        <td>${d.platform || "-"}</td>
+        <td>${d.location}</td>
         <td>${d.mac_address || "-"}</td>
         <td>
           <button onclick="editAsset(${d.id})">✏️</button>
