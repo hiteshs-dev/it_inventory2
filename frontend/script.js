@@ -903,21 +903,6 @@ function renderBatchChart(data) {
   });
 }
 
-
-/* ================== SWITCH PAGE ================== */
-
-function switchPage(page, btn) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById("page-" + page)?.classList.add("active");
-
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-
-  if (page === "dashboard") {
-    loadAssets(1);
-  }
-}
-
   // 🔍 SEARCH
   function applyFilters() {
   let filtered = [...dashboardData];
@@ -1067,10 +1052,5 @@ function switchPage(page, btn) {
     loadBills();
   }
 }
-
-/* ================== FEEDBACK ================== */
-showToast("✅ Asset saved successfully");
-showToast("🗑 Asset deleted");
-showToast("✏️ Editing asset — update details and submit");
 
 document.addEventListener("DOMContentLoaded", initApp);
