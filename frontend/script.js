@@ -1042,16 +1042,20 @@ async function loadBills() {
 
 // Load bills when page switches
 function switchPage(page, btn) {
-  document.querySelectorAll(".page").forEach(p =>
+  document.querySelectorAll(".page").forEach(p => 
     p.classList.remove("active")
   );
 
-  const pageElement = document.getElementById("page-" + page);
-  if (pageElement) {
-    pageElement.classList.add("active");
+  const targetPage = document.getElementById("page-" + page);
+
+  if (targetPage) {
+    targetPage.classList.add("active");
+  } else {
+    console.error("Page not found:", "page-" + page);
+    return;
   }
 
-  document.querySelectorAll(".nav-btn").forEach(b =>
+  document.querySelectorAll(".nav-btn").forEach(b => 
     b.classList.remove("active")
   );
 
