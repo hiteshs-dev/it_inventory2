@@ -990,6 +990,69 @@ async function loadAssets(page = 1) {
   renderPageInfo(result.total);
 }
 
+// ================= BILL REMINDER =================
+
+const BILL_API = "/api/bills"; // your Cloudflare worker endpoint
+
+const billForm = document.getElementById("billForm");
+const billList = document.getElementById("billList");
+
+if (billForm) {
+  billForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+      bill_name: document.getElementById("billName").value,
+      amount: document.getElementById("billAmount").value,
+      start_due_date: document.getElementById("billStartDate").value,
+      frequency: document.getElementById("billFrequency").value,
+      emails: document.getElementById("billEmails").value
+    };
+
+    await fetch(BILL_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    showToast("Bill Added Successfully");
+    billForm.reset();
+    loadBills();
+  });
+}
+
+async function loadBills() {
+  const res = await fetch(BILL_API);
+  const bills = await res.json();
+
+  billList.innerHTML = "";
+
+  bills.forEach(bill => {
+    const div = document.createElement("div");
+    div.className = "bill-card";
+    div.innerHTML = `
+      <strong>${bill.bill_name}</strong>
+      <p>₹${bill.amount}</p>
+      <p>Frequency: ${bill.frequency}</p>
+      <p>Start Date: ${bill.start_due_date}</p>
+    `;
+    billList.appendChild(div);
+  });
+}
+
+// Load bills when page switches
+function switchPage(page, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + page).classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+
+  if (page === "bills") {
+    loadBills();
+  }
+}
+
 
 /* ================== FEEDBACK ================== */
 showToast("✅ Asset saved successfully");
