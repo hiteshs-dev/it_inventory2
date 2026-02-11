@@ -1,5 +1,3 @@
-alert("Script is running");
-
 /* ================== GLOBAL ERROR DEBUG ================== */
 window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
