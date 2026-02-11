@@ -1042,17 +1042,25 @@ async function loadBills() {
 
 // Load bills when page switches
 function switchPage(page, btn) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById("page-" + page).classList.add("active");
+  document.querySelectorAll(".page").forEach(p =>
+    p.classList.remove("active")
+  );
 
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  const pageElement = document.getElementById("page-" + page);
+  if (pageElement) {
+    pageElement.classList.add("active");
+  }
+
+  document.querySelectorAll(".nav-btn").forEach(b =>
+    b.classList.remove("active")
+  );
+
+  if (btn) btn.classList.add("active");
 
   if (page === "bills") {
     loadBills();
   }
 }
-
 
 /* ================== FEEDBACK ================== */
 showToast("✅ Asset saved successfully");
