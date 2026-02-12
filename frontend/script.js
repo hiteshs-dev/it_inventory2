@@ -1,3 +1,7 @@
+alert("JS Loaded");
+
+  console.log("IT Inventory Loaded Successfully")
+
 /* ================== GLOBAL ERROR DEBUG ================== */
 window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
@@ -988,11 +992,12 @@ if (billForm) {
 
     const data = {
       bill_name: document.getElementById("billName").value,
-      amount: document.getElementById("billAmount").value,
-      start_due_date: document.getElementById("billStartDate").value,
-      frequency: document.getElementById("billFrequency").value,
-      emails: document.getElementById("billEmails").value
+      amount: document.getElementById("amount").value,
+      start_due_date: document.getElementById("dueDate").value,
+      frequency: document.getElementById("frequency").value,
+      emails: document.getElementById("emails").value
     };
+
 
     await fetch(BILL_API, {
       method: "POST",
