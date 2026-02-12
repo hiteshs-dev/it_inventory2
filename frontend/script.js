@@ -571,6 +571,9 @@ function renderRecent(data) {
 }
 
 function initApp() {
+  switchPage("entry");
+  switchPage("dashboard");
+  switchPage("bills");
 
   /* ===== FIELD TOGGLES ===== */
   if (role) {
