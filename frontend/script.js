@@ -572,8 +572,6 @@ function renderRecent(data) {
 
 function initApp() {
   switchPage("entry");
-  switchPage("dashboard");
-  switchPage("bills");
 
   /* ===== FIELD TOGGLES ===== */
   if (role) {
@@ -1034,28 +1032,14 @@ async function loadBills() {
 }
 
 // Load bills when page switches
-function switchPage(page, btn) {
-  document.querySelectorAll(".page").forEach(p => 
-    p.classList.remove("active")
-  );
+function switchPage(page) {
+  document.querySelectorAll(".page").forEach(p => {
+    p.style.display = "none";
+  });
 
-  const targetPage = document.getElementById("page-" + page);
-
-  if (targetPage) {
-    targetPage.classList.add("active");
-  } else {
-    console.error("Page not found:", "page-" + page);
-    return;
-  }
-
-  document.querySelectorAll(".nav-btn").forEach(b => 
-    b.classList.remove("active")
-  );
-
-  if (btn) btn.classList.add("active");
-
-  if (page === "bills") {
-    loadBills();
+  const activePage = document.getElementById(page);
+  if (activePage) {
+    activePage.style.display = "block";
   }
 }
 
