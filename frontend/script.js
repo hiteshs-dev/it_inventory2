@@ -1,7 +1,3 @@
-alert("JS Loaded");
-
-  console.log("IT Inventory Loaded Successfully")
-
 /* ================== GLOBAL ERROR DEBUG ================== */
 window.onerror = function (msg, src, line) {
   alert(`JS ERROR:\n${msg}\nLine: ${line}`);
