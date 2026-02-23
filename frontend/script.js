@@ -973,7 +973,7 @@ async function loadAssets(page = 1) {
 
 // ================= BILL REMINDER =================
 
-const BILL_API = "/api/bills"; // your Cloudflare worker endpoint
+const BILL_API = "C:\it_inventory\frontend\functions\api\bills.js"; // your Cloudflare worker endpoint
 
 const billForm = document.getElementById("billForm");
 
