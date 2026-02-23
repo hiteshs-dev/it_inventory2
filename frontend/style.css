@@ -1,6 +1,17 @@
 /* =========================
    THEME VARIABLES
 ========================= */
+
+/* ===== PAGE CONTROL FIX ===== */
+
+.page {
+  display: none;
+  padding: 20px;
+}
+
+.page.active {
+  display: block;
+}
 :root {
   --primary: #2563eb;
   --primary-dark: #1d4ed8;

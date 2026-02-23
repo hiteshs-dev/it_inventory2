@@ -1,8 +1,3 @@
-/* ================== GLOBAL ERROR DEBUG ================== */
-window.onerror = function (msg, src, line) {
-  alert(`JS ERROR:\n${msg}\nLine: ${line}`);
-};
-
 /* ================== dashboard ================== */
 let dashboardData = [];
 let roleChartInstance = null;
@@ -981,11 +976,19 @@ async function loadAssets(page = 1) {
 const BILL_API = "/api/bills"; // your Cloudflare worker endpoint
 
 const billForm = document.getElementById("billForm");
+
+if (billForm) {
+  billForm.addEventListener("submit", function(e) {
+    e.preventDefault();
 const billList = document.getElementById("billList");
 
 if (billForm) {
   billForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    document.addEventListener("DOMContentLoaded", function () {
+  switchPage("entry");
+});
 
     const data = {
       bill_name: document.getElementById("billName").value,
@@ -1026,21 +1029,20 @@ async function loadBills() {
     billList.appendChild(div);
   });
 }
+});
+}
 
 // Load bills when page switches
-function switchPage(page, btn) {
-  document.querySelectorAll(".page").forEach(p => 
-    p.classList.remove("active")
-  );
+function switchPage(page) {
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+  });
 
-  const targetPage = document.getElementById("page-" + page);
-
-  if (targetPage) {
-    targetPage.classList.add("active");
-  } else {
-    console.error("Page not found:", "page-" + page);
-    return;
+  const target = document.getElementById("page-" + page);
+  if (target) {
+    target.classList.add("active");
   }
+}
 
   document.querySelectorAll(".nav-btn").forEach(b => 
     b.classList.remove("active")
