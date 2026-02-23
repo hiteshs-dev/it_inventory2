@@ -511,6 +511,13 @@ function toggleMacField() {
   macField.style.display = "block"; // ✅ ALWAYS SHOW
 }
 
+function loginSuccess() {
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("navTabs").style.display = "flex";
+
+  switchPage('entry');
+}
+
 /* ===== dashboard render ===== */
 function renderStats(data) {
   const total = data.length;
