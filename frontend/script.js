@@ -1033,16 +1033,19 @@ async function loadBills() {
 }
 
 // Load bills when page switches
-function switchPage(page) {
-  document.querySelectorAll(".page").forEach(p => {
-    p.classList.remove("active");
-  });
+function switchPage(page, btn) {
+  document.querySelectorAll(".page").forEach(p => 
+    p.classList.remove("active")
+  );
 
-  const target = document.getElementById("page-" + page);
-  if (target) {
-    target.classList.add("active");
+  const targetPage = document.getElementById("page-" + page);
+
+  if (targetPage) {
+    targetPage.classList.add("active");
+  } else {
+    console.error("Page not found:", "page-" + page);
+    return;
   }
-}
 
   document.querySelectorAll(".nav-btn").forEach(b => 
     b.classList.remove("active")
