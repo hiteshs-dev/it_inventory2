@@ -1023,28 +1023,27 @@ async function loadBills() {
 }
 
 // Load bills when page switches
-function switchPage(page, btn) {
-  document.querySelectorAll(".page").forEach(p => 
-    p.classList.remove("active")
-  );
+function switchPage(pageName, btn) {
 
-  const targetPage = document.getElementById("page-" + page);
+  // Remove active from all pages
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
 
-  if (targetPage) {
-    targetPage.classList.add("active");
-  } else {
-    console.error("Page not found:", "page-" + page);
-    return;
+  // Remove active from nav buttons
+  document.querySelectorAll(".nav-btn").forEach(button => {
+    button.classList.remove("active");
+  });
+
+  // Add active to selected page
+  const target = document.getElementById("page-" + pageName);
+  if (target) {
+    target.classList.add("active");
   }
 
-  document.querySelectorAll(".nav-btn").forEach(b => 
-    b.classList.remove("active")
-  );
-
-  if (btn) btn.classList.add("active");
-
-  if (page === "bills") {
-    loadBills();
+  // Add active to clicked nav button
+  if (btn) {
+    btn.classList.add("active");
   }
 }
 
