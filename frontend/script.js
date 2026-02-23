@@ -446,6 +446,7 @@ const assetDesc = document.getElementById("assetDesc");
 const assetType = document.getElementById("asset_type");
 const assetId = document.getElementById("assetId");
 const purchaseDate = document.getElementById("purchase_date");
+const purchaseAssetDate = document.getElementById("purchaseAssetDate");
 
 const brand = document.getElementById("brand");
 const model = document.getElementById("model");
@@ -973,22 +974,13 @@ async function loadAssets(page = 1) {
 
 // ================= BILL REMINDER =================
 
-const BILL_API = "C:\it_inventory\frontend\functions\api\bills.js"; // your Cloudflare worker endpoint
-
+const BILL_API = "/api/bills";
 const billForm = document.getElementById("billForm");
-
-if (billForm) {
-  billForm.addEventListener("submit", function(e) {
-    e.preventDefault();
 const billList = document.getElementById("billList");
 
 if (billForm) {
   billForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    document.addEventListener("DOMContentLoaded", function () {
-  switchPage("entry");
-});
 
     const data = {
       bill_name: document.getElementById("billName").value,
@@ -998,20 +990,20 @@ if (billForm) {
       emails: document.getElementById("emails").value
     };
 
-
     await fetch(BILL_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
-    showToast("Bill Added Successfully");
     billForm.reset();
     loadBills();
   });
 }
 
 async function loadBills() {
+  if (!billList) return;
+
   const res = await fetch(BILL_API);
   const bills = await res.json();
 
@@ -1028,8 +1020,6 @@ async function loadBills() {
     `;
     billList.appendChild(div);
   });
-}
-});
 }
 
 // Load bills when page switches

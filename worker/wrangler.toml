@@ -6,3 +6,8 @@ compatibility_date = "2024-11-01"
 binding = "DB"
 database_name = "itm_inventory"
 database_id = "af27ae08-96ff-4a45-95e1-a15404042808"
+
+[[d1_databases]]
+binding = "BILL_DB"
+database_name = "bill_reminder_db2"
+database_id = "38b5ca90-a243-4ef6-a44c-ff1971c61262"
