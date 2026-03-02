@@ -1,0 +1,13 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/bills",
+      "mountPath": "/api",
+      "method": "",
+      "module": [
+        "api/bills.js:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}
