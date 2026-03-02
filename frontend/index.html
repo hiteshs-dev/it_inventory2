@@ -446,69 +446,23 @@
   <div id="toast" class="toast"></div>
 
   <!-- ================= BILL PAGE ================= -->
-<div id="page-bills" class="page">
+<form id="billForm">
+  <input type="text" id="billName" placeholder="Bill Name" required>
+  <input type="number" id="amount" placeholder="Amount" required>
+  <input type="date" id="dueDate" required>
+  
+  <select id="frequency" required>
+    <option value="">Select Frequency</option>
+    <option value="Monthly">Monthly</option>
+    <option value="Quarterly">Quarterly</option>
+    <option value="Half-Yearly">Half-Yearly</option>
+    <option value="Annually">Annually</option>
+  </select>
 
-  <!-- Add Bill Section -->
-  <div class="card form-card">
-    <h2>Add New Bill</h2>
-
-    <div class="form-group">
-      <label>Bill Name</label>
-      <input id="billName" type="text" placeholder="Enter Bill Name">
-    </div>
-
-    <div class="form-group">
-      <label>Amount (₹)</label>
-      <input id="amount" type="number" placeholder="Enter Amount">
-    </div>
-
-    <div class="form-group">
-      <label>Due Date</label>
-      <input id="dueDate" type="date">
-    </div>
-
-    <div class="form-group">
-      <label>Frequency</label>
-      <select id="frequency">
-        <option value="Monthly">Monthly</option>
-        <option value="Quarterly">Quarterly</option>
-        <option value="Half-Yearly">Half-Yearly</option>
-        <option value="Annually">Annually</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Emails (Max 10)</label>
-      <input id="emails" type="text" placeholder="email1@gmail.com, email2@gmail.com">
-    </div>
-
-    <button onclick="addBill()">Add Bill</button>
-  </div>
-
-  <!-- Bills Sections -->
-  <div class="grid">
-
-    <div class="card">
-      <h3>Monthly Bills</h3>
-      <div id="Monthly" class="bill-container"></div>
-    </div>
-
-    <div class="card">
-      <h3>Quarterly Bills</h3>
-      <div id="Quarterly" class="bill-container"></div>
-    </div>
-
-    <div class="card">
-      <h3>Half-Yearly Bills</h3>
-      <div id="Half-Yearly" class="bill-container"></div>
-    </div>
-
-    <div class="card">
-      <h3>Annual Bills</h3>
-      <div id="Annually" class="bill-container"></div>
-    </div>
-
-  </div>
+  <input type="text" id="emails" placeholder="Emails">
+  
+  <button type="submit">Add Bill</button>
+</form>
 
 </div>
 

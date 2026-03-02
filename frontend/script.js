@@ -512,10 +512,9 @@ function toggleMacField() {
 }
 
 function loginSuccess() {
-  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("loginModal").style.display = "none";
   document.getElementById("navTabs").style.display = "flex";
-
-  switchPage('entry');
+  switchPage("entry");
 }
 
 /* ===== dashboard render ===== */
@@ -978,58 +977,6 @@ async function loadAssets(page = 1) {
   renderPagination(result.total);
   renderPageInfo(result.total);
 }
-
-// ================= BILL REMINDER =================
-
-const BILL_API = "/api/bills";
-const billForm = document.getElementById("billForm");
-const billList = document.getElementById("billList");
-
-if (billForm) {
-  billForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = {
-      bill_name: document.getElementById("billName").value,
-      amount: document.getElementById("amount").value,
-      start_due_date: document.getElementById("dueDate").value,
-      frequency: document.getElementById("frequency").value,
-      emails: document.getElementById("emails").value
-    };
-
-    await fetch(BILL_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    billForm.reset();
-    loadBills();
-  });
-}
-
-async function loadBills() {
-  if (!billList) return;
-
-  const res = await fetch(BILL_API);
-  const bills = await res.json();
-
-  billList.innerHTML = "";
-
-  bills.forEach(bill => {
-    const div = document.createElement("div");
-    div.className = "bill-card";
-    div.innerHTML = `
-      <strong>${bill.bill_name}</strong>
-      <p>₹${bill.amount}</p>
-      <p>Frequency: ${bill.frequency}</p>
-      <p>Start Date: ${bill.start_due_date}</p>
-    `;
-    billList.appendChild(div);
-  });
-}
-
-<form onsubmit="event.preventDefault(); addBill();"></form>
 
 function addBill() {
   const billName = document.getElementById("billName").value;
