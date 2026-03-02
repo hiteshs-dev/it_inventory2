@@ -1,21 +1,26 @@
 /* =====================================================
-   ITM INVENTORY SYSTEM - WHITE CLASSIC PROFESSIONAL UI
+   ITM INVENTORY SYSTEM - MODERN WHITE + BLUE UI
 ===================================================== */
 
 /* =========================
    ROOT THEME
 ========================= */
 :root {
-  --primary: #1e3a8a;
+  --primary: #1e40af;
   --primary-light: #3b82f6;
-  --bg: #f4f6f9;
+  --primary-dark: #172554;
+  --accent: #60a5fa;
+
+  --bg: #f8fafc;
   --card: #ffffff;
-  --border: #e5e7eb;
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  --shadow-sm: 0 4px 10px rgba(0,0,0,0.04);
-  --shadow-md: 0 10px 25px rgba(0,0,0,0.06);
-  --radius: 12px;
+  --border: #e2e8f0;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+  --radius: 14px;
 }
 
 /* =========================
@@ -25,13 +30,22 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", "Inter", sans-serif;
+  font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 body {
-  background: var(--bg);
+  background: linear-gradient(to bottom right, #f8fafc, #eef2ff);
   color: var(--text-main);
-  line-height: 1.5;
+  min-height: 100vh;
+  animation: fadeIn 0.6s ease;
+}
+
+/* =========================
+   FADE ANIMATION
+========================= */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* =========================
@@ -41,9 +55,10 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 40px;
-  background: #fff;
+  padding: 20px 40px;
+  background: white;
   border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -52,9 +67,10 @@ header {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 18px;
-  font-weight: 600;
+  gap: 14px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
 }
 
 /* =========================
@@ -62,7 +78,7 @@ header {
 ========================= */
 .nav-tabs {
   display: flex;
-  gap: 28px;
+  gap: 30px;
 }
 
 .nav-tabs button {
@@ -74,6 +90,7 @@ header {
   color: var(--text-muted);
   padding: 8px 0;
   position: relative;
+  transition: 0.3s;
 }
 
 .nav-tabs button:hover {
@@ -87,11 +104,11 @@ header {
 .nav-tabs button.active::after {
   content: "";
   position: absolute;
-  bottom: -10px;
+  bottom: -8px;
   left: 0;
   width: 100%;
   height: 3px;
-  background: var(--primary);
+  background: linear-gradient(to right, var(--primary), var(--accent));
   border-radius: 2px;
 }
 
@@ -101,10 +118,16 @@ header {
 .page {
   display: none;
   padding: 40px;
+  animation: slideUp 0.4s ease;
 }
 
 .page.active {
   display: block;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* =========================
@@ -117,20 +140,17 @@ header {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   margin-bottom: 30px;
-  transition: 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .card:hover {
   box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
 }
 
 /* =========================
    FORM DESIGN
 ========================= */
-form {
-  margin-top: 10px;
-}
-
 .form-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -154,16 +174,12 @@ label {
 input,
 select,
 textarea {
-  padding: 11px 12px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   font-size: 14px;
   background: #fff;
-  transition: 0.2s;
-}
-
-textarea {
-  resize: vertical;
+  transition: 0.3s;
 }
 
 input:focus,
@@ -171,51 +187,36 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--primary-light);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
 }
 
 /* =========================
    BUTTONS
 ========================= */
 button {
-  background: var(--primary);
+  background: linear-gradient(to right, var(--primary), var(--primary-light));
   color: #fff;
   border: none;
-  padding: 11px 18px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: 0.3s ease;
 }
 
 button:hover {
-  background: #162f6b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(30,64,175,0.3);
 }
 
 .btn-excel {
-  background: #059669;
-}
-
-.btn-excel:hover {
-  background: #047857;
+  background: linear-gradient(to right, #059669, #10b981);
 }
 
 /* =========================
    DASHBOARD
 ========================= */
-.dashboard-toolbar {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-}
-
-.dashboard-toolbar input,
-.dashboard-toolbar select {
-  width: 220px;
-}
-
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -224,22 +225,23 @@ button:hover {
 }
 
 .stat-card {
-  background: #fff;
-  padding: 22px;
+  background: white;
+  padding: 25px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  text-align: center;
+  transition: 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-card div:first-child {
-  font-size: 26px;
-  font-weight: bold;
+  font-size: 30px;
+  font-weight: 800;
   color: var(--primary);
-}
-
-.stat-card div:last-child {
-  font-size: 13px;
-  color: var(--text-muted);
 }
 
 /* =========================
@@ -251,39 +253,37 @@ button:hover {
 }
 
 .data-table th {
-  background: #f9fafb;
-  padding: 13px;
+  background: #f1f5f9;
+  padding: 14px;
   font-size: 12px;
   text-transform: uppercase;
   color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
   text-align: left;
 }
 
 .data-table td {
-  padding: 13px;
-  font-size: 14px;
+  padding: 14px;
   border-bottom: 1px solid var(--border);
 }
 
 .data-table tr:hover {
-  background: #f9fafb;
+  background: #f8fafc;
 }
 
 /* =========================
    BILL REMINDER
 ========================= */
 .bill-item {
-  background: #f0f7ff;
-  border-left: 4px solid var(--primary);
-  padding: 14px;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  background: linear-gradient(to right, #eff6ff, #dbeafe);
+  border-left: 5px solid var(--primary);
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  transition: 0.3s;
 }
 
-.bill-title {
-  font-weight: 600;
-  margin-bottom: 4px;
+.bill-item:hover {
+  transform: translateX(4px);
 }
 
 /* =========================
@@ -292,7 +292,7 @@ button:hover {
 #loginModal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: linear-gradient(to bottom right, #1e3a8a, #3b82f6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -300,17 +300,13 @@ button:hover {
 }
 
 .login-box {
-  background: #fff;
-  padding: 35px;
-  border-radius: 16px;
-  width: 340px;
+  background: white;
+  padding: 40px;
+  border-radius: 18px;
+  width: 360px;
   box-shadow: var(--shadow-md);
   text-align: center;
-}
-
-.login-box input {
-  margin-bottom: 15px;
-  width: 100%;
+  animation: slideUp 0.4s ease;
 }
 
 /* =========================
@@ -323,33 +319,13 @@ button:hover {
 }
 
 .pagination button {
-  background: #f3f4f6;
+  background: #e2e8f0;
   color: #000;
 }
 
 .pagination button.active {
   background: var(--primary);
   color: #fff;
-}
-
-/* =========================
-   UTILITIES
-========================= */
-.hidden {
-  display: none;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 25px 0 15px 0;
-}
-
-.sub-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 20px 0 10px 0;
-  color: var(--text-muted);
 }
 
 /* =========================
