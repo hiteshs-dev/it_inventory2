@@ -1029,6 +1029,38 @@ async function loadBills() {
   });
 }
 
+<form onsubmit="event.preventDefault(); addBill();"></form>
+
+function addBill() {
+  const billName = document.getElementById("billName").value;
+  const amount = document.getElementById("amount").value;
+  const dueDate = document.getElementById("dueDate").value;
+  const frequency = document.getElementById("frequency").value;
+  const emails = document.getElementById("emails").value;
+
+  if (!billName || !amount || !dueDate || !frequency) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  let bills = JSON.parse(localStorage.getItem("bills")) || [];
+
+  bills.push({
+    billName,
+    amount,
+    dueDate,
+    frequency,
+    emails
+  });
+
+  localStorage.setItem("bills", JSON.stringify(bills));
+
+  alert("Bill Added Successfully");
+
+  loadBills(); // refresh UI
+}
+
+
 // Load bills when page switches
 function switchPage(pageName, btn) {
 
