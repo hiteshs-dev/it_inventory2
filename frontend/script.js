@@ -583,25 +583,46 @@ function initApp() {
   }
 
   /* ===== LOGIN ===== */
+/* ================== INIT APP ================== */
+document.addEventListener("DOMContentLoaded", function () {
+
+  // Hide app until login
+  document.getElementById("mainApp").style.display = "none";
+  document.getElementById("navTabs").style.display = "none";
+
   const loginForm = document.getElementById("loginForm");
 
-if (loginForm) {
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
+  if (loginForm) {
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
 
-    if (user === "admin" && pass === "unix@2026") {
-      document.getElementById("loginModal").style.display = "none";
-      document.getElementById("navTabs").style.display = "flex";
-      switchPage("entry");     // open Data Entry page
-      loadAssets(1);           // load dashboard data
-    } else {
-      document.getElementById("loginError").style.display = "block";
-    }
-  });
-}
+      if (user === "admin" && pass === "unix@2026") {
+
+        // Hide login modal
+        document.getElementById("loginModal").style.display = "none";
+
+        // Show main app
+        document.getElementById("mainApp").style.display = "block";
+
+        // Show navigation
+        document.getElementById("navTabs").style.display = "flex";
+
+        // Load dashboard
+        loadAssets(1);
+
+        // Load bills
+        loadBills();
+
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
+    });
+  }
+
+});
 
   /* ================== DOWNLOAD ================== */
   const download2026Btn = document.getElementById("download2026");
@@ -976,41 +997,6 @@ async function loadAssets(page = 1) {
   renderRecent(dashboardData);
   renderPagination(result.total);
   renderPageInfo(result.total);
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-
-  const loginForm = document.getElementById("loginForm");
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      login();
-    });
-  }
-
-});
-
-function login() {
-
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-
-  // Change credentials here
-  if (username === "admin" && password === "1234") {
-
-    // Hide login modal
-    document.getElementById("loginModal").style.display = "none";
-
-    // Show main app
-    document.getElementById("mainApp").style.display = "block";
-
-    // Show navigation
-    document.getElementById("navTabs").style.display = "flex";
-
-  } else {
-    document.getElementById("loginError").style.display = "block";
-  }
 }
 
   // Attach form submit after DOM loads
