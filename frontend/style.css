@@ -348,3 +348,11 @@ button:hover {
     padding: 25px;
   }
 }
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
