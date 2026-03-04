@@ -980,6 +980,39 @@ async function loadAssets(page = 1) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  const loginForm = document.getElementById("loginForm");
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      login();
+    });
+  }
+
+});
+
+function login() {
+
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  // Change credentials here
+  if (username === "admin" && password === "1234") {
+
+    // Hide login modal
+    document.getElementById("loginModal").style.display = "none";
+
+    // Show main app
+    document.getElementById("mainApp").style.display = "block";
+
+    // Show navigation
+    document.getElementById("navTabs").style.display = "flex";
+
+  } else {
+    document.getElementById("loginError").style.display = "block";
+  }
+}
+
   // Attach form submit after DOM loads
   const billForm = document.getElementById("billForm");
 
@@ -989,8 +1022,6 @@ document.addEventListener("DOMContentLoaded", function () {
       addBill();
     });
   }
-
-});
 
 // ================= ADD BILL =================
 function addBill() {
