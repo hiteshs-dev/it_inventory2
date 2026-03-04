@@ -1004,32 +1004,54 @@ function addBill() {
 
   alert("Bill Added Successfully");
 
-  loadBills(); // refresh UI
+  loadBills();
 }
 
+function loadBills() {
+  const bills = JSON.parse(localStorage.getItem("bills")) || [];
+
+  ["Monthly","Quarterly","Half-Yearly","Annually"].forEach(type => {
+    document.getElementById(type).innerHTML = "";
+  });
+
+  bills.forEach(bill => {
+    const container = document.getElementById(bill.frequency);
+    if (!container) return;
+
+    const div = document.createElement("div");
+    div.className = "bill-item";
+    div.innerHTML = `
+      <strong>${bill.billName}</strong><br>
+      ₹${bill.amount}<br>
+      Due: ${bill.dueDate}
+    `;
+
+    container.appendChild(div);
+  });
+}
 
 // Load bills when page switches
 function switchPage(pageName, btn) {
 
-  // Remove active from all pages
   document.querySelectorAll(".page").forEach(page => {
     page.classList.remove("active");
   });
 
-  // Remove active from nav buttons
   document.querySelectorAll(".nav-btn").forEach(button => {
     button.classList.remove("active");
   });
 
-  // Add active to selected page
   const target = document.getElementById("page-" + pageName);
   if (target) {
     target.classList.add("active");
   }
 
-  // Add active to clicked nav button
   if (btn) {
     btn.classList.add("active");
+  }
+
+  if (pageName === "bills") {
+    loadBills();
   }
 }
 
