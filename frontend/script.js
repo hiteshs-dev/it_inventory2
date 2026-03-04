@@ -614,6 +614,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Attach form submit after DOM loads
+  const billForm = document.getElementById("billForm");
+
+  if (billForm) {
+    billForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      addBill();
+    });
+  }
+
 });
 
   /* ================== DOWNLOAD ================== */
@@ -990,16 +1000,6 @@ async function loadAssets(page = 1) {
   renderPagination(result.total);
   renderPageInfo(result.total);
 }
-
-  // Attach form submit after DOM loads
-  const billForm = document.getElementById("billForm");
-
-  if (billForm) {
-    billForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      addBill();
-    });
-  }
 
 // ================= ADD BILL =================
 function addBill() {
