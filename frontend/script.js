@@ -583,14 +583,14 @@ function initApp() {
   }
 
   /* ===== LOGIN ===== */
-/* ================== INIT APP ================== */
+//* ================== LOGIN ================== */
 document.addEventListener("DOMContentLoaded", function () {
 
-  // Hide app until login
+  const loginForm = document.getElementById("loginForm");
+
+  // Hide app before login
   document.getElementById("mainApp").style.display = "none";
   document.getElementById("navTabs").style.display = "none";
-
-  const loginForm = document.getElementById("loginForm");
 
   if (loginForm) {
     loginForm.addEventListener("submit", function (e) {
@@ -601,19 +601,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (user === "admin" && pass === "unix@2026") {
 
-        // Hide login modal
         document.getElementById("loginModal").style.display = "none";
-
-        // Show main app
         document.getElementById("mainApp").style.display = "block";
-
-        // Show navigation
         document.getElementById("navTabs").style.display = "flex";
 
-        // Load dashboard
         loadAssets(1);
-
-        // Load bills
         loadBills();
 
       } else {
