@@ -978,6 +978,21 @@ async function loadAssets(page = 1) {
   renderPageInfo(result.total);
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+
+  // Attach form submit after DOM loads
+  const billForm = document.getElementById("billForm");
+
+  if (billForm) {
+    billForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      addBill();
+    });
+  }
+
+});
+
+// ================= ADD BILL =================
 function addBill() {
   const billName = document.getElementById("billName").value;
   const amount = document.getElementById("amount").value;
@@ -1004,14 +1019,18 @@ function addBill() {
 
   alert("Bill Added Successfully");
 
+  document.getElementById("billForm").reset();
+
   loadBills();
 }
 
+// ================= LOAD BILLS =================
 function loadBills() {
   const bills = JSON.parse(localStorage.getItem("bills")) || [];
 
-  ["Monthly","Quarterly","Half-Yearly","Annually"].forEach(type => {
-    document.getElementById(type).innerHTML = "";
+  ["Monthly", "Quarterly", "Half-Yearly", "Annually"].forEach(type => {
+    const container = document.getElementById(type);
+    if (container) container.innerHTML = "";
   });
 
   bills.forEach(bill => {
@@ -1030,7 +1049,7 @@ function loadBills() {
   });
 }
 
-// Load bills when page switches
+// ================= SWITCH PAGE =================
 function switchPage(pageName, btn) {
 
   document.querySelectorAll(".page").forEach(page => {
@@ -1042,22 +1061,11 @@ function switchPage(pageName, btn) {
   });
 
   const target = document.getElementById("page-" + pageName);
-  if (target) {
-    target.classList.add("active");
-  }
+  if (target) target.classList.add("active");
 
-  if (btn) {
-    btn.classList.add("active");
-  }
+  if (btn) btn.classList.add("active");
 
   if (pageName === "bills") {
     loadBills();
   }
 }
-
-document.getElementById("billForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  addBill();
-});
-
-document.addEventListener("DOMContentLoaded", initApp);
