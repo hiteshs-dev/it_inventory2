@@ -1055,4 +1055,9 @@ function switchPage(pageName, btn) {
   }
 }
 
+document.getElementById("billForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  addBill();
+});
+
 document.addEventListener("DOMContentLoaded", initApp);

@@ -445,24 +445,34 @@
 <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
-  <!-- ================= BILL PAGE ================= -->
-<form id="billForm">
-  <input type="text" id="billName" placeholder="Bill Name" required>
-  <input type="number" id="amount" placeholder="Amount" required>
-  <input type="date" id="dueDate" required>
-  
-  <select id="frequency" required>
-    <option value="">Select Frequency</option>
-    <option value="Monthly">Monthly</option>
-    <option value="Quarterly">Quarterly</option>
-    <option value="Half-Yearly">Half-Yearly</option>
-    <option value="Annually">Annually</option>
-  </select>
+  <!-- ================= BILL REMINDER PAGE ================= -->
+<div id="page-bills" class="page">
 
-  <input type="text" id="emails" placeholder="Emails">
-  
-  <button type="submit">Add Bill</button>
-</form>
+  <h2>Bill Reminder</h2>
+
+  <form id="billForm" class="bill-form-row">
+    <input type="text" id="billName" placeholder="Bill Name" required>
+    <input type="number" id="amount" placeholder="Amount" required>
+    <input type="date" id="dueDate" required>
+
+    <select id="frequency" required>
+      <option value="">Select Frequency</option>
+      <option value="Monthly">Monthly</option>
+      <option value="Quarterly">Quarterly</option>
+      <option value="Half-Yearly">Half-Yearly</option>
+      <option value="Annually">Annually</option>
+    </select>
+
+    <input type="text" id="emails" placeholder="Emails">
+    <button type="submit">Add Bill</button>
+  </form>
+
+  <div id="Monthly"></div>
+  <div id="Quarterly"></div>
+  <div id="Half-Yearly"></div>
+  <div id="Annually"></div>
+
+</div>
 
 </div>
 
