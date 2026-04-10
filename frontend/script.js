@@ -512,7 +512,7 @@ function toggleMacField() {
 }
 
 function loginSuccess() {
-  document.getElementById("loginModal").style.display = "none";
+  document.getElementById("loginModal").style.display = "flex";
   document.getElementById("navTabs").style.display = "flex";
   switchPage("entry");
 }
@@ -1076,38 +1076,6 @@ function switchPage(pageName, btn) {
   }
 }
 
-/* ================== APP START ================== */
-document.addEventListener("DOMContentLoaded", function () {
-
-  // Hide app initially
-  document.getElementById("mainApp").style.display = "none";
-  document.getElementById("navTabs").style.display = "none";
-
-  // LOGIN
-  const loginForm = document.getElementById("loginForm");
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-
-      if (user === "admin" && pass === "unix@2026") {
-
-        document.getElementById("loginModal").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-        document.getElementById("navTabs").style.display = "flex";
-
-        loadAssets(1);
-        loadBills();
-
-      } else {
-        document.getElementById("loginError").style.display = "block";
-      }
-    });
-  }
-
   // BILL FORM
   const billForm = document.getElementById("billForm");
   if (billForm) {
@@ -1121,4 +1089,4 @@ document.addEventListener("DOMContentLoaded", function () {
   toggleFields();
   toggleMacField();
 
-});
+  initApp(); // ✅ ADD THIS LINE
