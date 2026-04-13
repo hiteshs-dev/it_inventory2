@@ -7,6 +7,47 @@ let batchChartInstance = null;
 /* ================== API ================== */
 const API_BASE = "https://itm-inventory-api.hiteshs.workers.dev";
 
+/* ================== LOGIN ================== */
+document.addEventListener("DOMContentLoaded", function () {
+
+  const loginForm = document.getElementById("loginForm");
+
+  document.getElementById("mainApp").style.display = "none";
+  document.getElementById("navTabs").style.display = "none";
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+
+      if (user === "admin" && pass === "unix@2026") {
+
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("navTabs").style.display = "flex";
+
+        loadAssets(1);
+        loadBills();
+
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
+    });
+  }
+
+  const billForm = document.getElementById("billForm");
+
+  if (billForm) {
+    billForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      addBill();
+    });
+  }
+
+});
+
 /* ================== CAMPUS → AREA MASTER ================== */
 
 const campusAreas = {
@@ -512,7 +553,8 @@ function toggleMacField() {
 }
 
 function loginSuccess() {
-  document.getElementById("loginModal").style.display = "flex";
+  document.getElementById("loginModal").style.display = "none";
+  document.getElementById("mainApp").style.display = "block";
   document.getElementById("navTabs").style.display = "flex";
   switchPage("entry");
 }
@@ -581,47 +623,6 @@ function initApp() {
     platform.addEventListener("change", toggleMacField);
     toggleMacField(); // initial state
   }
-
-/* ================== LOGIN ================== */
-document.addEventListener("DOMContentLoaded", function () {
-
-  const loginForm = document.getElementById("loginForm");
-
-  document.getElementById("mainApp").style.display = "none";
-  document.getElementById("navTabs").style.display = "none";
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-
-      if (user === "admin" && pass === "unix@2026") {
-
-        document.getElementById("loginModal").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-        document.getElementById("navTabs").style.display = "flex";
-
-        loadAssets(1);
-        loadBills();
-
-      } else {
-        document.getElementById("loginError").style.display = "block";
-      }
-    });
-  }
-
-  const billForm = document.getElementById("billForm");
-
-  if (billForm) {
-    billForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      addBill();
-    });
-  }
-
-});
 
   /* ================== DOWNLOAD ================== */
   const download2026Btn = document.getElementById("download2026");
@@ -1076,17 +1077,8 @@ function switchPage(pageName, btn) {
   }
 }
 
-  // BILL FORM
-  const billForm = document.getElementById("billForm");
-  if (billForm) {
-    billForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      addBill();
-    });
-  }
-
   // INIT FIELD STATES
   toggleFields();
   toggleMacField();
 
-  initApp(); // ✅ ADD THIS LINE
+ 
